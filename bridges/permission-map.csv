@@ -1,5 +1,0 @@
-android_perm,polkit_action,direction
-android.permission.ACCESS_FINE_LOCATION,org.halide.perm.location,android-to-host
-android.permission.READ_CONTACTS,org.halide.perm.contacts,both
-android.permission.RECORD_AUDIO,org.halide.perm.mic,both
-android.permission.CAMERA,org.halide.perm.camera,both
