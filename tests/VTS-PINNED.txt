@@ -1,0 +1,16 @@
+# VTS-PINNED.txt — VTS modules pinned for the CTS/VTS allowlist (ch.10 §2/§9).
+#
+# Allowlist policy (ch.10 §9): pass-required honest subset — one module per line,
+# run on REF-A userdebug only (never eng; CI asserts getenforce=Enforcing before the
+# suite starts). Every entry needs module name + min pass count + known-flake
+# annotation in the results bundle (cts-results/<date>/). Quarantine per ch.10 §6/§11:
+# bug ID + 30-day expiry, counts as non-green in release notes, cap 5 per suite.
+# Informational watchlist (IMS telephony, DRM L1, biometrics, NNAPI vendor) is NOT
+# listed here. Never claim full CTS/VTS: results published per release with device
+# fingerprint + patch level (ch.10 §2).
+VtsHalAudioV7_0TargetTest
+VtsHalCameraProviderV2_4TargetTest
+VtsHalSensorsV2_0TargetTest
+VtsHalPowerTargetTest
+VtsHalHealthTargetTest
+VtsHalVibratorV1_3TargetTest

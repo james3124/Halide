@@ -1,0 +1,11 @@
+# SYNTHETIC FIXTURE - not a field recording. Replay input for tests/gnss-replay.sh
+# (ch.10 S17: golden NMEA + producer pinned together). Coordinates are fixed
+# lab-anchor values for pipeline verification only; never presented as measured
+# TTFF evidence. Real acceptance evidence comes from tests/gnss-track.sh on the
+# open-sky fixture with the footnote set (unit, firmware, sky-view, cell state).
+$GPRMC,120000,V,4807.038,N,01131.000,E,000.0,000.0,190926,001.2,W*74
+$GPGGA,120000,4807.038,N,01131.000,E,0,04,1.5,100.0,M,46.9,M,,*48
+$GPRMC,120030,A,4807.038,N,01131.000,E,005.3,084.4,190926,001.2,W*6E
+$GPGGA,120030,4807.038,N,01131.000,E,1,07,0.9,102.3,M,46.9,M,,*45
+$GPRMC,120045,A,4807.040,N,01131.002,E,006.1,084.0,190926,001.2,W*64
+$GPGGA,120045,4807.040,N,01131.002,E,1,07,0.9,102.5,M,46.9,M,,*4C

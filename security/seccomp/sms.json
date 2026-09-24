@@ -1,0 +1,12 @@
+{
+  "schema": "halide-seccomp-v1",
+  "bridge": "sms",
+  "default_action": "SCMP_ACT_ERRNO",
+  "notes": "SMS/WMS parser (attack-test R3/R4: multipart storms, retriever scoping). execve + ptrace denied.",
+  "syscalls": [
+    {"names": ["read", "write", "recvmsg", "sendmsg", "poll", "epoll_wait", "epoll_ctl"], "action": "SCMP_ACT_ALLOW", "reason": "event-loop + bridge socket IO"},
+    {"names": ["openat", "close", "fstat", "mmap", "munmap"], "action": "SCMP_ACT_ALLOW", "reason": "minimal runtime linkage, no exec"},
+    {"names": ["futex", "nanosleep", "clock_gettime", "getpid", "gettid"], "action": "SCMP_ACT_ALLOW", "reason": "threading + timers"},
+    {"names": ["execve", "execveat", "ptrace", "process_vm_writev"], "action": "SCMP_ACT_ERRNO", "reason": "RCE containment: parsers never shell out (binding)"}
+  ]
+}

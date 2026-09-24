@@ -1,0 +1,19 @@
+[Unit]
+Description=HALIDE suspend prepare (container quiesce before sleep)
+Documentation=file:hybrid-os-plan/05-debian-systemd-dual-init.md
+Before=sleep.target suspend.target hibernate.target hybrid-sleep.target
+RequiredBy=sleep.target suspend.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+# Host decides sleep; container receives onPause hints (ch.05 section 21 Doze
+# mapping). Android never holds the AP awake past host suspend.
+ExecStart=/usr/sbin/halide-suspend-prepare --freeze-hints --timeout 10
+TimeoutSec=15s
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+NoNewPrivileges=yes
+
+[Install]
+WantedBy=sleep.target suspend.target

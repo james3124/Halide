@@ -1,0 +1,29 @@
+# debian/halide-time-vote.policy -- time-source vote order (ch.05 section 29).
+# Consumed by /usr/sbin/halide-time-vote (source: debian/scripts/halide-time-vote).
+# Checked by tests/time-vote.sh: this file must name manual, NITZ and ntp.
+#
+# Vote order (highest trust first):
+#   1. manual (user-manual pick, "Automatic" off): explicit human wins.
+#      Stored with timestamp; stale-manual older than 30d warns "check
+#      date/time" on TLS failures. Marks TIME_HOLD_MANUAL; NTP/NITZ/GNSS
+#      are logged-only while manual holds.
+#   2. ntp (chrony, endpoints in chrony.conf): default when Automatic on.
+#      Fresh means synced within 24h with root dispersion <=1s (TIME_SYNC
+#      journal line records stratum + dispersion per sync). NTP wins any
+#      diverge; divergence >5min raises TIME_DIVERGE + telemetry counter
+#      when opted-in, never a silent step.
+#   3. NITZ (ModemManager ModemTime signal via ril-bridge): trusted for
+#      timezone-hint + coarse sanity only. Never steps the clock more than
+#      +-5min without NTP corroboration (base-station NITZ-spoofing threat,
+#      ch.08 supply-chain table). When NTP is stale and NITZ is fresh, NITZ
+#      steps with TIME_SOURCE=NITZ journal tag + re-sync NTP ASAP (metered
+#      defer rule respected: data-cost honesty outranks sub-minute accuracy).
+#   4. gnss (position-time): lowest weight for wall-clock. Aids SUPL
+#      acquisition but 1s-class GNSS time never overrides NTP.
+#      GNSS-week-rollover tested per SKU with fixture.
+# Holdover: no fresh source -> hold last-known + CLOCK_HOLDOVER banner in
+# Settings, per-SKU rtc-drift bounds shown (hw/<sku>/rtc-drift.md).
+# RTC_SUSPECT: RTC reads pre-2026 or post-2040 -> ignore RTC, holdover +
+# NTP ASAP + log (dead-coin-cell diagnosis, not mystery).
+# Backward jumps >60s require container drain-quiesce: stop-container, step,
+# restart-container (forward jumps apply immediately + TIME_SET broadcast).

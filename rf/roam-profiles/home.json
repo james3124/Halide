@@ -1,0 +1,8 @@
+{
+  "_comment": "NM roam profile: home SSID class (wifi-bt-coexist S4). Host NM owns roaming; Android WifiService sees post-roam state via bridge (no independent roam decisions). ASCII only.",
+  "ssid_class": "home",
+  "rssi_roam_threshold_dbm": "TODO",
+  "blacklist_timers_s": "TODO",
+  "ft_80211r": "TODO (lab AP configured r/non-r both; result per mode recorded, not assumed)",
+  "status": "UNTESTED"
+}

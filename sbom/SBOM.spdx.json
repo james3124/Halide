@@ -1,0 +1,7 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "name": "HALIDE",
+  "documentNamespace": "https://halide.local/sbom/0.0-phone",
+  "creationInfo": {"created": "builder-fills", "creators": ["Tool: halide-sbom-stub"]},
+  "packages": [{"name": "HALIDE", "versionInfo": "0.0-phone", "supplier": "TODO-builder-fills", "downloadLocation": "NONE"}]
+}

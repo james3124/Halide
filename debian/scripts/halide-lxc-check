@@ -1,0 +1,59 @@
+#!/bin/sh
+# halide-lxc-check -- container config + kernel expectation gate.
+# Source: hybrid/debian/scripts/halide-lxc-check.
+# Asserts: lxc-checkconfig meets debian/lxc-checkconfig.expected, the generated
+# /var/lib/lxc/android/config matches debian/overlays/android.conf.in, and the
+# AppArmor profile is byte-identical to debian/apparmor.d/lxc-android.
+# Exit contract: 0 green / 1 drift or missing requirement / 2 tool missing.
+set -eu
+EXPECTED="debian/lxc-checkconfig.expected"
+CONF_IN="debian/overlays/android.conf.in"
+PROF="debian/apparmor.d/lxc-android"
+FAIL=0
+
+if ! command -v lxc-checkconfig >/dev/null 2>&1; then
+  echo "SKIP: lxc-checkconfig absent (builder/device only)"
+  exit 2
+fi
+HAVE="$(lxc-checkconfig 2>/dev/null || echo "no-output")"
+if [ -f "$EXPECTED" ]; then
+  while read want; do
+    case "$want" in
+      ""|\#*) continue ;;
+    esac
+    key="$(echo "$want" | cut -d: -f1)"
+    case "$key" in
+      MUST*) frag="$(echo "$want" | cut -d: -f2 | awk '{print $1}')" ;;
+      *) continue ;;
+    esac
+    echo "$HAVE" | grep -qi "$frag" || { echo "FAIL: lxc-checkconfig lacks $frag"; FAIL=1; }
+  done < "$EXPECTED"
+  echo "halide-lxc-check: expectations compared against $EXPECTED"
+else
+  echo "FAIL: $EXPECTED missing" >&2
+  FAIL=1
+fi
+
+# Generated config must match the template (never hand-edited on device).
+if [ -f /var/lib/lxc/android/config ] && [ -f "$CONF_IN" ]; then
+  if ! diff -q "$CONF_IN" /var/lib/lxc/android/config >/dev/null 2>&1; then
+    echo "FAIL: live container config drifted from $CONF_IN" >&2
+    FAIL=1
+  else
+    echo "halide-lxc-check: container config matches template"
+  fi
+else
+  echo "note: live config or template absent (builder only)"
+fi
+
+# AppArmor byte-identity (hand-edit without repo update fails boundary-check).
+if command -v apparmor_parser >/dev/null 2>&1 && [ -f "$PROF" ]; then
+  apparmor_parser --dump lxc-android 2>/dev/null | diff -q - "$PROF" >/dev/null 2>&1 \
+    && echo "halide-lxc-check: apparmor profile byte-identical" \
+    || { echo "FAIL: apparmor profile drifted from $PROF" >&2; FAIL=1; }
+else
+  echo "note: apparmor_parser or profile absent (builder only)"
+fi
+
+[ "$FAIL" -eq 0 ] && echo "halide-lxc-check: PASS"
+exit "$FAIL"

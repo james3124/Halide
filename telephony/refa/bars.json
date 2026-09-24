@@ -1,0 +1,14 @@
+{
+  "_comment": "Signal bars mapping for SKU refa (ch.07 S14). dBm->bars thresholds MEASURED against this modem's reported values, never copied from stock screenshots. Airplane/shutdown override bars (MODEM_DEAD clears indicators <=3s). ASCII only.",
+  "sku": "refa",
+  "rat": "LTE",
+  "thresholds_dbm_TODO": {"bars_1": "TODO", "bars_2": "TODO", "bars_3": "TODO", "bars_4": "TODO"},
+  "rules": [
+    "airplane/shutdown states override bars (never stale 4-bars with dead modem)",
+    "roaming R badge mirrors MM home-only flag",
+    "data-activity arrows reflect actual bearer traffic (1s window), never animation",
+    "frozen arrows + '...' badge during DATA_STALL SUSPECT (data-stall-policy.conf T+0)"
+  ],
+  "audit": "50-state script (register/deregister/airplane/SIM-pull/data-toggle): every indicator matches mmcli within 3s, 0 mismatch to pass",
+  "status": "UNTESTED"
+}

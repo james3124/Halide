@@ -1,0 +1,10 @@
+# HOT-STRUCTS.txt — layouts frozen for LTS 6.6 KMI (ch.03 §41)
+# These structs are dereferenced by vendor modules (display/touch/modem/audio) that we
+# cannot rebuild every LTS bump. Any non-additive change = ABI-BREAK gate (needs the
+# blessed-break MR shape: abidiff + justification + rebuilt-module list + 3 signs).
+struct file         # f_op/private_data used by bridge char devices (binder-like ioctls)
+struct task_struct  # pid/comm/flags used by lmkd-PSI helper + container monitor
+struct sock         # sk_family/sk_state used by qrtr + ril_bridge net paths
+struct device       # of_node/driver_data — every probed vendor driver
+struct clk_hw       # rate ops deref in panel/DSI clock tuning path
+# Rule: fields listed in abi/6.6/abi.xml are the pinned subset; whole-struct layout frozen.

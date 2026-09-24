@@ -1,0 +1,11 @@
+// SAMPLE pw-top output — REF-A idle, marked SAMPLE (not measured this boot; replace with live capture)
+// Build: halide-20260814-a3f9c1e2b4d6 · REDACTED (no node serials)
+pw-top
+S   ID  QUANT   RATE    WAIT    BUSY   W/Q   NAME
+R   35      0    48k   0.0us   0.1us  0.00  pipewire
+R   40   1024  48.0k  18.2us  41.7us  0.00  WirePlumber
+R   52   1024  48.0k  22.9us  88.3us  0.00  alsa_output.platform-sound.analog-stereo
+R   61   1024  48.0k  31.5us 104.6us  0.00  alsa_input.platform-sound.analog-stereo
+R   77   1024  48.0k  14.8us  30.2us  0.00  android-container-audio-sink
+R   84   1024  48.0k  12.1us  21.4us  0.00  metronome-sample-node
+// Expected: quantum 1024 @ 48k, no driver errors, no xruns on idle

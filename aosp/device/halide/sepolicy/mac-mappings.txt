@@ -1,0 +1,13 @@
+# device/halide/sepolicy/mac-mappings.txt - SELinux <-> host MAC mapping (S14/S15).
+# Container SELinux context (lxc.selinux.context) pairs with the host
+# AppArmor profile (lxc.apparmor.profile). Both must agree or start refuses.
+selinux_context=u:r:container:s0 apparmor_profile=halide-android scope=whole-container
+selinux_domain=rild apparmor_peer=halide-rild-bridge qrtr_socket={read,write} note=scoped-qrtr-not-diag_device
+selinux_domain=hal_camera apparmor_peer=halide-camera-adapter calib_label=hal_camera_calib_file:read-only
+selinux_domain=hal_sensors apparmor_peer=halide-sensors-multihal iio_nodes=read-only
+selinux_domain=hal_gnss apparmor_peer=halide-gnss-shim nmea_validity_flag=carried-with-fix
+selinux_domain=audioserver apparmor_peer=halide-audio-proxy socket=/run/halide/audio-proxy:SO_PEERCRED-audioserver-only
+selinux_domain=halide_ota apparmor_peer=halide-ota inactive_slot=blk_file:write active_slot=deny
+# Precise-macro rule (S14): binder call missing -> binder_call(source,target),
+# never allow * *. Denial triage order: IIO node missing? handle mismatch?
+# hal_* denial in audit.log? (sensors S21 failure ladder pattern).

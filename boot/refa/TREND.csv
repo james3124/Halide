@@ -1,0 +1,8 @@
+# TREND.csv - REF-A 5-boot stage medians over time (ch.03 S28/S29)
+# Weekly boot-trend job appends one row per week (CI HW nightly tail).
+# >500ms week-over-week regression pages the stage owner with ranked diff.
+# Cold = power-off >=60s, flash cold. Warm rows labeled warm, never averaged
+# into cold medians (S29). Ambient/cable footnote per ch.10 S8 honesty rule.
+date,ver,abl_s,kernel_to_systemd_s,systemd_to_login_s,container_to_completed_s,total_cold_s,cold_or_warm,cable_charger_ambient,notes
+2026-09-02,6.6.30-seed,,,,,,cold,lab-bench-25C-stock-cable-18W,SEED-row-no-HW-run-yet-replace-on-first-5-boot-median
+# Budgets (S7/S28): abl<=8 kernel_to_systemd<=12 systemd_to_login<=15 container_to_completed<=60 total<=45

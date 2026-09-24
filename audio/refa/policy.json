@@ -1,0 +1,9 @@
+{
+  "call_gains": {
+    "handset": 0.8,
+    "speaker": 1.0,
+    "bt": 0.9
+  },
+  "media_default": 0.7,
+  "preempt_call_over_media": true
+}

@@ -1,0 +1,36 @@
+# device/halide/sepolicy/neverallow.halide - neverallow baseline (ch.04 S14.3).
+# Every audit2allow addition elsewhere requires a BUG:<id> EXPIRY:<date>
+# WHY:<one line> comment or it is rejected in review. Baseline diffs must be
+# empty per release or carry per-line justification linked to a bug (S14.4).
+# New-denial SLA (S27): BUG within 48h, disposition within 14 days; eng-build
+# permissive domains each carry ENG-ONLY: + removal release, and any
+# permissive domain on a release-branch build fails the neverallow-eng check.
+
+# Container breakout: the Android container never escapes its boundary.
+neverallow container self:capability sys_admin;
+# BUG:HALIDE-SEL-001 EXPIRY:never WHY:container breakout is the top threat
+neverallow container binder_device:chr_file { ioctl read write };
+# BUG:HALIDE-SEL-001 EXPIRY:never WHY:binder scoped to binderfs mounts only
+neverallow container host_daemon:unix_stream_socket { connectto read write };
+# BUG:HALIDE-SEL-002 EXPIRY:never WHY:bridges are host-initiated, never container-dialed
+
+# Raw persist write: adb keys host-provisioned, never container-writable (S35).
+neverallow container persist_file:file { write append };
+# BUG:HALIDE-SEL-003 EXPIRY:never WHY:locked-device USB consent bypass via adb keys
+
+# Direct fuel-gauge access from container: single source is host (S11, S34).
+neverallow container battery_gauge_sysfs:file { read write };
+# BUG:HALIDE-SEL-004 EXPIRY:never WHY:dual-read paths split = P1 agreement break
+
+# OTA sidecar writes inactive slot only, never reads key material (ch.08 S9).
+neverallow halide_ota active_slot_block:blk_file write;
+# BUG:HALIDE-SEL-005 EXPIRY:never WHY:active-slot write bricks the fallback
+neverallow halide_ota self:process execve;
+# BUG:HALIDE-SEL-005 EXPIRY:never WHY:OTA verifies with pubs via verified path
+neverallow halide_ota keys_file:file read;
+# BUG:HALIDE-SEL-005 EXPIRY:never WHY:sidecar never touches private keys
+
+# Single-stack networking invariant: only org.halide.NetRoute (NM-owned) may
+# program default routes; direct ip route from container refused and logged.
+neverallow container self:capability net_admin;
+# BUG:HALIDE-SEL-006 EXPIRY:never WHY:container netd calls are proxied (api-stability S2)

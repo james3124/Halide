@@ -1,0 +1,29 @@
+# unit-budgets.txt - REF-A systemd per-unit boot budgets (ch.03 S28)
+# Owner: Platform (systemd side) + Kernel (device-wait side).
+# Source: systemd-analyze blame top-15 + critical-chain per release.
+# Rule: any MR pushing a unit over budget must carry halide-boot-timeline CSV
+# + justification or CI boot-budget-check fails the MR (S28 regression rule).
+# Units wait on named device units (Requires=sys-devices-...), never sleep N
+# (every sleep in boot-path scripts needs WHY-NOT-EVENT comment, S29).
+
+# Format: unit | budget_ms | stage | why
+halide-early.service | 800 | kernel->systemd | pstore collection (S30: files land in /var/lib/halide/pstore/<boot-id>/ with boot-id linkage)
+systemd-udev-trigger.service | 1500 | kernel->systemd | scoped device waits only; blanket settle banned (S28 anti-pattern 2)
+halide-cpufreq.service | 500 | kernel->systemd | validates OPP signatures vs DT then applies power/refa/cpufreq-policy.conf (S33)
+halide-cpuidle-apply.service | 300 | kernel->systemd | applies call-cpuidle.conf profile state; logs CALL-PROFILE lines (S38)
+halide-alarm-bridge.service | 400 | systemd->login | mirrors container next-wakeup to rtcWakeAlarm; three-source min (S36)
+halide-psi-monitor.service | 300 | systemd->login | PSI 10s windows; MEMORY-PRESSURE journal + metric (S34)
+halide-android-prepare.service | 8000 | systemd->login | container pivot; network calls --timeout 5 + degraded banner (S28 anti-pattern 1); unplugged-boot still reaches lock within budget+10s
+halide-firstboot-check.service | 2000 | container->completed | A/B health mark + DTBO-MISSING fallback handling (S40 layer 3)
+halide-time-vote.service | 1000 | container->completed | RTC+NTP+GNSS 2-of-3 vote; >10s step needs agreement (S36)
+systemd-timesyncd.service | 1500 | systemd->login | wall-clock discipline RootDistanceMaxSec=5 PollIntervalMinSec=32 (S36)
+
+# systemd->login stage total budget <=15s: sum of named units above (13.3s) +
+# 1.7s contingency. systemd->login head of critical-chain is usually a
+# device-wait or bridge-prepare doing synchronous I/O: fix by scoping the
+# wait (ch.05 S18(a)), not by lengthening timeouts (S29).
+
+# Verification
+# - [ ] systemd-analyze blame top-15 + critical-chain archived per release.
+# - [ ] plot-<ver>.svg committed per release (see plot-note.md).
+# - [ ] No unit over budget without timeline CSV + justification.

@@ -1,0 +1,27 @@
+[Unit]
+Description=HALIDE netd<->NetworkManager bridge (NM single-stack owner)
+Documentation=file:hybrid-os-plan/05-debian-systemd-dual-init.md
+After=NetworkManager.service halide-android.service
+Requires=NetworkManager.service
+BindsTo=halide-android.service
+Slice=halide.slice
+
+[Service]
+Type=simple
+User=halide-bridges
+ExecStart=/usr/sbin/halide-netd-bridge --socket /run/halide/netd.sock
+Restart=on-failure
+RestartSec=2s
+CPUWeight=600
+MemoryHigh=120M
+MemoryMax=200M
+TasksMax=60
+OOMScoreAdjust=-100
+# Single-stack rule (ch.05 section 4): NM touches interfaces/routes/DNS; the
+# bridge only translates or rejects with PERMISSION_DENIED + host journal line.
+SystemCallFilter=@system-service @network-io
+SystemCallErrorNumber=EPERM
+NoNewPrivileges=yes
+
+[Install]
+WantedBy=halide.slice

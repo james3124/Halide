@@ -1,0 +1,28 @@
+[Unit]
+Description=HALIDE early boot (binderfs mount, kmsg, pstore collect)
+Documentation=file:hybrid-os-plan/05-debian-systemd-dual-init.md
+DefaultDependencies=no
+After=systemd-modules-load.service local-fs.target
+Before=systemd-udevd.service halide-android.service
+Requires=dev-kmsg.device
+# No ConditionPathExists on /sys/fs/pstore: the collect step tolerates its
+# absence (cp fallback), and binderfs mounting must not depend on pstore.
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+# binderfs mountpoint for the Android container (LXC bind in android.conf.in).
+ExecStart=/bin/sh -c 'mountpoint -q /dev/binderfs || mount -t binderfs binderfs /dev/binderfs'
+# pstore/ramoops collection before rotation (ch.05 section 19):
+# each boot-id gets its own dir so crash evidence is never overwritten.
+ExecStart=/bin/sh -c 'B=$(cat /proc/sys/kernel/random/boot_id); mkdir -p /var/lib/halide/pstore/$B; cp -a /sys/fs/pstore/. /var/lib/halide/pstore/$B/ 2>/dev/null || true'
+ExecStart=/bin/sh -c 'ls /var/lib/halide/pstore | tail -n +11 | while read d; do rm -rf /var/lib/halide/pstore/$d; done'
+# kmsg marker so triage can order early-boot lines (ch.05 section 19).
+ExecStart=/bin/sh -c 'echo "halide-early: binderfs mounted, pstore collected" | tee /dev/kmsg'
+StandardOutput=journal+console
+# Seccomp containment for an early-boot oneshot (ch.08 section 10 discipline).
+SystemCallFilter=@system-service @mount
+SystemCallErrorNumber=EPERM
+
+[Install]
+WantedBy=sysinit.target

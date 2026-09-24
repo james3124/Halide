@@ -1,0 +1,38 @@
+# device/halide/refa/hal-services.txt - HAL service registration list (S19/S22).
+# Two views of the same truth must agree or the MR explains: binder services
+# (service list, cf. appendix-04A service-list.txt) + HAL instances
+# (lshal --debug, archived per release next to the appendix-04A service list).
+# Layer-2 contract: halide-android-health runs `service check <name>` per row.
+# New services appearing here require manifest + sepolicy refs in the same MR.
+
+# --- binder services (lxc-attach -n android -- service list) ---
+radio: android.hardware.radio@1.6::IRadio/slot1
+media.camera: android.hardware.camera.provider@2.7::ICameraProvider/halide_0
+media.audio_flinger: android.hardware.audio@7.1 primary
+sensorservice: android.hardware.sensors@2.1::ISensors/multihal
+lights: android.hardware.light.ILights/default
+vibrator: android.hardware.vibrator.IVibrator/default
+power: android.hardware.power.IPower/default (HIDL 5.0)
+health: android.hardware.health.IHealth/default
+usb: android.hardware.usb.IUsb/default
+wifi: android.hardware.wifi IWifi (vendor, STA)
+bluetooth_manager: android.hardware.bluetooth.audio@2.1 (software-pcm v1)
+drm: android.hardware.drm@1.4 widevine-L3
+keystore: android.hardware.keymaster@4.1-software + gatekeeper-software
+thermal: android.hardware.thermal.IThermal/default
+powerstats: android.hardware.power.stats.IPowerStats/default
+location: android.hardware.gnss@2.1::IGnss/default (time_valid flag carried)
+
+# --- HAL instances (lxc-attach -n android -- lshal --debug) ---
+# android.hardware.audio@7.1::IDevicesFactory/primary (hwbinder)
+# android.hardware.camera.provider@2.7::ICameraProvider/halide_0 (hwbinder, threadpool 4)
+# android.hardware.sensors@2.1::ISensors/multihal (hwbinder)
+# android.hardware.gnss@2.1::IGnss/default (hwbinder)
+# android.hardware.radio@1.6::IRadio/slot1 (hwbinder)
+# android.hardware.power@5.0::IPower/default (hwbinder)
+# android.hardware.light.ILights/default (aidl)
+# android.hardware.vibrator.IVibrator/default (aidl)
+# android.hardware.health.IHealth/default (aidl)
+# android.hardware.usb.IUsb/default (aidl)
+# android.hardware.thermal.IThermal/default (aidl)
+# android.hardware.power.stats.IPowerStats/default (aidl)

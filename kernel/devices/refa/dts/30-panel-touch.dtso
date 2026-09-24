@@ -1,0 +1,49 @@
+/dts-v1/; /plugin/;
+/* 30-panel-touch.dtsi — REF-A DSI panel + WLED + touch (appendix-03A §4 sequence).
+ * SRC: stock-dump (DSI timings, panel compatible) + datasheet panel p12 (backlight PWM period).
+ * Bring-up order: 1) WLED-only 2) simple-panel 3) full driver 4) touch IRQ 5) 20-cycle suspend.
+ * Touch: FocalTech FT8719, I2C addr 0x38, IRQ gpio, fw touch_fw.bin v12 (appendix-03A §5).
+ */
+/ {
+	fragment@0 {
+		target = <&mdss_mdp>;
+		__overlay__ {
+			status = "okay"; /* SRC: stock-dump */
+		};
+	};
+	fragment@1 {
+		target = <&mdss_dsi0>;
+		__overlay__ {
+			status = "okay"; /* SRC: stock-dump */
+			panel@0 {
+				compatible = "halide,refa-panel-v1"; /* SRC: stock-dump — NT36672 timings from stock DT */
+				reg = <0>;
+				vddio-supply = <&vreg_l14a>; /* SRC: stock-dump — panel IO rail */
+				backlight = <&pmi8998_wled>; /* SRC: datasheet-p12 — PWM period + max brightness */
+				port {
+					panel_in: endpoint {
+						remote-endpoint = <&dsi0_out>;
+					};
+				};
+			};
+		};
+	};
+	fragment@2 {
+		target = <&i2c5>;
+		__overlay__ {
+			status = "okay"; /* SRC: stock-dump */
+			touch@38 {
+				compatible = "focaltech,fts"; /* SRC: stock-dump — FT8719 */
+				reg = <0x38>;
+				interrupt-parent = <&tlmm>;
+				interrupts = <91 0x2>;
+				touchscreen-size-x = <1080>; /* SRC: measured-20260502 — evtest 10-finger slots verified */
+				touchscreen-size-y = <2280>; /* SRC: measured-20260502 */
+				focaltech,firmware-name = "touch_fw.bin"; /* SRC: stock-dump v12 */
+				pinctrl-names = "default", "sleep";
+				pinctrl-0 = <&i2c5_default>;
+				pinctrl-1 = <&i2c5_sleep>;
+			};
+		};
+	};
+};

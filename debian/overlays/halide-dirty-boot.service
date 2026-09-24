@@ -1,0 +1,21 @@
+[Unit]
+Description=HALIDE dirty-boot check (fsck + bridge-DB integrity after forced cutoff)
+Documentation=file:hybrid-os-plan/05-debian-systemd-dual-init.md
+After=local-fs.target
+Before=halide-android.service
+# Runs only when the previous shutdown skipped the drain (10s power-hold PMIC
+# cutoff bypasses drain by design, ch.05 section 26). Clean boots skip this.
+ConditionPathExists=!/var/lib/halide/clean-shutdown
+Requires=dev-disk-by\x2dpartlabel-HALIDE_USERDATA.device
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/sbin/halide-firstboot-check --dirty-boot
+TimeoutSec=120s
+StandardOutput=journal+console
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+
+[Install]
+WantedBy=sysinit.target

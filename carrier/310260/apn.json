@@ -1,0 +1,19 @@
+{
+  "_comment": "APN database entry for 310260 (ch.07 S21). Source hierarchy: blessed-lab > mbpi snapshot > carrier OTA push (authenticated only) > user manual (user-override never clobbered). ASCII only.",
+  "mcc_mnc": "310260",
+  "apns": [
+    {"name": "default-internet", "apn": "fast.t-mobile.com", "auth": "none",
+     "types": ["default", "supl"], "mvno_type": "gid", "mvno_match": "TODO",
+     "fallback_order": 1, "verified": "UNTESTED", "ims_separate": true, "ip_type": "TODO-4-vs-6-vs-46"},
+    {"name": "mms", "apn": "TODO-mms-apn", "mmsc": "http://mmsc.msg.t-mobile.com/mms/wapenc",
+     "mms_proxy": "none", "types": ["mms"], "fallback_order": 2, "verified": "UNTESTED",
+     "mms_max_bytes": "TODO", "mms_autofetch_metered": false}
+  ],
+  "metered_override": "absent (= metered; S24 discipline)",
+  "db_version": "TODO",
+  "source": "TODO (blessed-lab + mbpi-SNAPSHOT-DATE)",
+  "delivery_reports": "TODO (full/partial/none per smsc-mmsc-detail S1)",
+  "ussd": "UNTESTED",
+  "sms_concat": "UNTESTED",
+  "puk_help": "TODO-carrier-support-number"
+}

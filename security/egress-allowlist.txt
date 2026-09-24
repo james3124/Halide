@@ -1,0 +1,13 @@
+# egress-allowlist.txt -- off-means-off allowlist (ch.05 S15, ch.08 S10/S23)
+# Owner: Security + Platform * A declined device emits ONLY this traffic
+# (tests/telemetry-off.sh captures 10 min post-boot and FAILs on anything else).
+# Connectivity-check endpoints are allowlisted URIs + HTTPS (S23 row 2);
+# DNS-fallback events logged (DNS_FALLBACK journal).
+
+ntp                            # NTP (time sync)
+time.                          # time-host prefix
+connectivity-check             # captive-portal / connectivity probe (allowlisted URI only)
+halide-ota-report              # OTA staging health report (user-initiated trains only)
+
+# Rule: every new egress source names its toggle (code-review rule, S15);
+# an untagged telemetry call-site fails telemetry-off.sh static proof.

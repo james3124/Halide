@@ -1,0 +1,37 @@
+# initcalls-6.6.30.txt - REF-A ranked initcall table (ch.03 S29) - SEED
+# Producer: python3 hybrid/scripts/initcall-rank.py <dmesg-with-initcall_debug>
+# Capture: sacrificial REF-A, eng build (initcall_debug present eng-only per
+# cmdline-registry.md), same cable/charger/ambient footnote per ch.10 S8.
+# Status SEED: rows below are the RANK FORMAT with placeholder medians from
+# bring-up notes, NOT measured 5-boot medians. Replace with script output on
+# first HW run; any new entry >200ms gets flagged per S28.
+# Triage order (fixed, S29): slowest initcall first (async_probe conversion
+# with before/after medians), then systemd critical-chain head, then
+# container tail (ch.04 S7 table before kernel blame).
+
+| rank | initcall | usecs |
+|---|---|---|
+| 1 | qcom_q6v5_pas_init (mpss/adsp PAS auth - sleeping HW, async candidate) | 185000 |
+| 2 | msm_drm_init (display probe incl. DSI link train) | 142000 |
+| 3 | ufs_qcom_init (link training + clkscale/hibern8 setup) | 98000 |
+| 4 | dwc3_qcom_init (PHY init + role-switch) | 41000 |
+| 5 | sdhci_msm_init (only where slot populated; else deferred) | 22000 |
+| 6 | i2c_qcom_cci_init (camera CCI; touch FW handshake rides here) | 18000 |
+| 7 | qpnp_smb_init (charger detect path) | 9000 |
+| 8 | arm_smmu_init (CB alloc; faults triaged per S39) | 7000 |
+| 9 | rpmh_regulator_init (rail votes; audit vs hw/refa/regulator-baseline.txt) | 5000 |
+| 10 | rtc_pm8xxx_init (hctosys wall-time restore; S36 clock-jump audit <=1s) | 1200 |
+total=10 initcalls shown=10 - triage: slowest first (async_probe), then critical-chain head
+
+# Async/defer rules (the only legal moves, S29):
+# - Probe functions hitting sleeping hardware (firmware load, regulator
+#   settle, touch FW handshake) MUST be async or deferred (probe_type /
+#   deferred_probe_timeout) with a comment citing the measured stall.
+#   Sync sleeps in probe are review fails.
+# - Top-10 movement across releases is investigated (order drift), not ignored
+#   (same discipline as appendix-03A S5 firmware load order).
+
+# Verification
+# - [ ] Regenerated per release from eng dmesg (this seed replaced by output).
+# - [ ] No new entry >200ms without OPT-LOG.md entry + justification.
+# - [ ] initcall_debug absent from release cmdline (registry S37 CI grep).

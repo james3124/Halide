@@ -1,0 +1,13 @@
+region,number,class
+US,911,PSAP
+US,112,PSAP
+US,000,PSAP
+US,999,PSAP
+EU,112,PSAP
+UK,999,PSAP
+UK,112,PSAP
+JP,110,police
+JP,118,coast-guard
+JP,119,fire-ambulance
+AU,000,PSAP
+AU,112,PSAP

@@ -1,0 +1,14 @@
+[Unit]
+Description=HALIDE power top sampler (5s, 4GB cap)
+After=multi-user.target
+Slice=halide.slice
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/halide-power top
+Restart=on-failure
+RestartSec=5s
+CPUWeight=100
+
+[Install]
+WantedBy=multi-user.target

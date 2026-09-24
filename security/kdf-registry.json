@@ -1,0 +1,35 @@
+{
+  "schema": "halide-kdf-registry-v1",
+  "prohibited": {
+    "kdfs": ["pbkdf2-hmac-md5", "pbkdf2-hmac-sha1", "des", "3des", "crypt-des"],
+    "note": "md5/sha1/des banned in tree for key derivation and transport; legacy compat never inherits (ch.08 S32)",
+    "enforcement": "scripts/kdf-registry-check.sh fails build on any prohibited algorithm reference"
+  },
+  "approved": [
+    {
+      "name": "argon2id",
+      "status": "approved",
+      "use": "LUKS2 userdata derivation (ch.08 S9/S32)",
+      "params_default": {"m_mb": 1024, "t": 4, "p": 2},
+      "unlock_slo": {"p50_ms": 2000, "p95_ms": 3000},
+      "skus": {"default": "inherit", "REF-A": {"m_mb": 1024, "t": 4, "p": 2}, "REF-B": {"m_mb": 1536, "t": 4, "p": 4}}
+    },
+    {
+      "name": "pbkdf2-hmac-sha256",
+      "status": "approved",
+      "use": "legacy-keyslot compat + halide-pin-derive fallback",
+      "constraints": {"min_iterations": 210000, "salt_min_bytes": 16}
+    },
+    {
+      "name": "hkdf-sha256",
+      "status": "approved",
+      "use": "key wrapping/derivation inside LUKS-unlocked keyring (FBE master -> per-app, ch.08 S9)",
+      "constraints": {"min_salt_bytes": 16, "info_label_required": true}
+    }
+  ],
+  "cipher_pins": {
+    "luks2": "aes-xts-plain64 512-bit (256 data + 256 tweak), sector 4096",
+    "fbe": "AES-256-GCM per-app keys wrapped by LUKS-unlocked keyring"
+  },
+  "rotation": "m/t/p or cipher change = rotation ceremony (dual sign + transparency entry), never a silent config edit (ch.08 S32)"
+}

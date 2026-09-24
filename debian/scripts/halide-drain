@@ -1,0 +1,79 @@
+#!/bin/sh
+# halide-drain -- shutdown/reboot drain ladder (ch.05 section 26).
+# Source: hybrid/debian/scripts/halide-drain (installed to /usr/sbin/, run as
+# ExecStop of halide-drain.service with TimeoutStopSec=45s).
+# Exit contract: 0 drained / 1 drain forced (DRAIN_KILL9 or skipped step) / 2 skip.
+set -eu
+FORCED=0
+BOOTID="$(cat /proc/sys/kernel/random/boot_id 2>/dev/null || echo unknown)"
+log() { echo "halide-drain: $1" | systemd-cat -t halide-drain 2>/dev/null || echo "halide-drain: $1"; }
+
+# T+0s: broadcast PrepareForShutdown + ACTION_SHUTDOWN (apps get 5s to flush).
+log "T+0 PrepareForShutdown broadcast"
+if command -v busctl >/dev/null 2>&1; then
+  busctl emit /org/halide/Android org.halide.Android PrepareForShutdown b true 2>/dev/null || true
+fi
+if command -v lxc-attach >/dev/null 2>&1; then
+  lxc-attach -n android -- am broadcast -a android.intent.action.ACTION_SHUTDOWN 2>/dev/null || true
+fi
+# Chats/SMS send-queue fsync + bridge DB checkpoint (same code as the OTA
+# snapshot path, ch.05 section 12 -- not a second implementation).
+if command -v halide-backup >/dev/null 2>&1; then
+  halide-backup --checkpoint-only 2>/dev/null || true
+fi
+# WHY-NOT-EVENT: Android shutdown broadcast is fire-and-forget; the 5s flush
+# window is a fixed deadline (no completion event exists host-side).
+sleep 5
+
+# T+5s: freeze new MO dials/SMS submits ("Shutting down" queue variant).
+log "T+5 freeze MO traffic"
+if command -v halide-ril-bridge >/dev/null 2>&1; then
+  halide-ril-bridge --freeze --reason shutdown 2>/dev/null || true
+fi
+
+# T+5-20s: lxc-stop -t 15 (SIGPWR -> SIGTERM -> SIGKILL). Wedged containers
+# delay shutdown by 15s max, never indefinitely.
+log "T+5 lxc-stop -t 15"
+if command -v lxc-stop >/dev/null 2>&1 && lxc-info -n android 2>/dev/null | grep -qi running; then
+  if lxc-stop -n android -t 15 2>/dev/null; then
+    log "container stopped clean"
+  else
+    log "DRAIN_KILL9 container forced"
+    lxc-stop -n android --kill 2>/dev/null || true
+    FORCED=1
+  fi
+else
+  log "container not running, skip stop"
+fi
+
+# T+20-30s: modem detach via MM (clean deregister). Emergency-callback window
+# respected: within 30min of an emergency call, wait or require override.
+log "T+20 modem detach"
+if command -v mmcli >/dev/null 2>&1; then
+  if [ -f /run/halide/emergency-callback-until ] && [ "$(date +%s)" -lt "$(cat /run/halide/emergency-callback-until 2>/dev/null || echo 0)" ]; then
+    log "emergency-callback window active, detach deferred to user override"
+  else
+    mmcli --modem-disable 2>/dev/null || true
+  fi
+fi
+
+# T+30-40s: unmount idmapped binds + LUKS sync (no crypto-erase here;
+# factory-reset is a separate two-confirmation path, ch.05 section 12).
+log "T+30 unmount binds + sync"
+umount /data/android/system 2>/dev/null || true
+umount /data/android/vendor 2>/dev/null || true
+sync
+
+# T+40s: journal flush + pstore clean marker so next boot distinguishes
+# clean-off from crash (ramoops triage reads this marker first, ch.03).
+log "T+40 flush + marker"
+journalctl --flush 2>/dev/null || true
+echo "SHUTDOWN-CLEAN $BOOTID" > /var/lib/halide/clean-shutdown 2>/dev/null || true
+
+if [ "$FORCED" -eq 0 ]; then
+  log "drain clean"
+  exit 0
+else
+  log "drain forced (DRAIN_KILL9)"
+  exit 1
+fi

@@ -1,0 +1,20 @@
+# device/halide/refa/vendor_module_list.txt - vendor_boot/vendor_dlkm gate (S17).
+# One .ko per line: module, expected vermagic, sha256 of the stable-kABI
+# portion. halide-android-prepare diffs /proc/modules vs this list before
+# starting the container: missing module = refuse with named-module banner
+# (never boot with different radio behavior silently); extra module = warn +
+# EXTRA_MODULE journal (investigated, not ignored). List changes require
+# BSP + Security sign (a module added is attack surface added). Quarterly
+# modinfo dump archived per SKU (params + versions).
+# HASHES MARKED FILL-AT-BUILD below are placeholders completed by the builder
+# from the first signed vendor drop inventory (S23); never ship FILL-AT-BUILD.
+# vermagic kernel: 6.6.51-halide SMP preempt mod_unload aarch64
+qrtr.ko 6.6.51-halide-SMP-preempt-mod_unload-aarch64 FILL-AT-BUILD
+qmi_helpers.ko 6.6.51-halide-SMP-preempt-mod_unload-aarch64 FILL-AT-BUILD
+rmtfs_mem.ko 6.6.51-halide-SMP-preempt-mod_unload-aarch64 FILL-AT-BUILD
+cnss2.ko 6.6.51-halide-SMP-preempt-mod_unload-aarch64 FILL-AT-BUILD
+qca_cld3_wlan.ko 6.6.51-halide-SMP-preempt-mod_unload-aarch64 FILL-AT-BUILD
+btpower.ko 6.6.51-halide-SMP-preempt-mod_unload-aarch64 FILL-AT-BUILD
+camss.ko 6.6.51-halide-SMP-preempt-mod_unload-aarch64 FILL-AT-BUILD
+snd_soc_sdm845.ko 6.6.51-halide-SMP-preempt-mod_unload-aarch64 FILL-AT-BUILD
+# SIGN: BSP ________  Security ________  date ________ (dual-sign per change)

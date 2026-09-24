@@ -1,0 +1,69 @@
+# hybrid ci release - ch.09 S11 release pipeline (~2 days + ceremony)
+# Phone-safe: text-only gating; signing ceremony + staged OTA are manual jobs.
+# Artifacts retained 180 days. Exit contract: 0 pass / 1 fail / 2 infra-or-refused.
+---
+stages:
+  - repro
+  - smoke
+  - compliance
+  - ceremony
+  - rollout
+
+variables:
+  LOG_DIR: hybrid/logs
+
+two-builder-repro:
+  stage: repro
+  script:
+    - bash hybrid/scripts/build-all.sh refa user --no-sign
+    - bash hybrid/scripts/repro-stage.sh assemble latest
+    - echo "hash compare modulo listed fields (ch.09 S2); divergence pages Security"
+
+hardware-smoke:
+  stage: smoke
+  needs: [two-builder-repro]
+  script:
+    - bash hybrid/tests/ota-rollback-test.sh --redact
+    - bash hybrid/tests/provision-reset.sh --redact
+    - echo "smoke on both REF units (ch.09 S11)"
+
+cts-vts-subset:
+  stage: smoke
+  script:
+    - echo "CTS/VTS subset per ch.10; quarantined entries in tests/quarantine.txt"
+
+sbom-release:
+  stage: compliance
+  script:
+    - bash hybrid/scripts/sbom.sh
+    - bash hybrid/scripts/sbom-diff.sh sbom/SBOM-prev.spdx.json sbom/SBOM.spdx.json
+    - bash hybrid/scripts/license-check.sh
+    - bash hybrid/scripts/notice-check.sh
+    - bash hybrid/scripts/ota-budget-check.sh
+
+testkey-grep:
+  stage: compliance
+  script:
+    - echo "avbtool info must not show testkey on user images (ch.09 S3 gate)"
+
+signing-ceremony:
+  stage: ceremony
+  when: manual
+  script:
+    - bash hybrid/scripts/sign-all.sh --ceremony
+    - echo "two custodians, verbal key-id + rollback check, anomalies-or-none line"
+
+staged-ota:
+  stage: rollout
+  when: manual
+  needs: [signing-ceremony]
+  script:
+    - bash hybrid/scripts/rollout-autopilot.sh release/rollout-$VER.md
+    - echo "1 pct -> 10 pct -> 50 pct -> 100 pct, 48h bake each, rollback >2 pct halts"
+
+transparency-publish:
+  stage: rollout
+  when: manual
+  script:
+    - bash hybrid/scripts/transparency-check.sh transparency/$VER
+    - echo "NEVER auto-flash from CI"

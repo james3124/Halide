@@ -1,0 +1,58 @@
+# ci/kernel-pipeline.yml — kernel+docs pipeline, NO-COMPILE mode.
+# Text-only gates only: budgets, registries, audits. Never compiles/flashes/signs from CI.
+# Scripts live in ../scripts relative to this file; jobs run from the repo checkout root
+# (same convention as ci/nightly.yaml). Exit contract: 0 pass / 1 fail / 2 infra-or-refused.
+---
+stages:
+  - smoke
+  - budget-check
+  - socket-audit
+  - consistency
+
+variables:
+  LOG_DIR: hybrid/logs
+
+smoke:tests:
+  stage: smoke
+  script:
+    - sh hybrid/tests/smoke.sh
+    - python3 hybrid/tests/test_bridges.py
+
+smoke:kernel-config:
+  stage: smoke
+  script:
+    - bash hybrid/scripts/kconfig/merge_config.sh --check hybrid/kernel/halide-base.fragment hybrid/kernel/devices/refa/sku.fragment
+    - python3 hybrid/scripts/dtbo-lint.py --src hybrid/kernel/devices/refa
+
+budget:wc:
+  stage: budget-check
+  script:
+    - bash hybrid/scripts/wc-budget.sh
+
+budget:oot:
+  stage: budget-check
+  script:
+    - bash hybrid/scripts/count-oot.sh
+
+budget:ota-rows:
+  stage: budget-check
+  allow_failure: true          # stub BUDGET.md has no OTA rows yet (ch.09 S27 fills at assemble)
+  script:
+    - bash hybrid/scripts/ota-budget-check.sh
+
+socket-audit:registry:
+  stage: socket-audit
+  script:
+    - bash hybrid/scripts/socket-audit.sh
+
+socket-audit:consistency:
+  stage: socket-audit
+  script:
+    - bash hybrid/scripts/plan-consistency.sh --strict
+    - bash hybrid/scripts/md-links.sh
+
+consistency:records:
+  stage: consistency
+  script:
+    - bash hybrid/scripts/search-gate.sh || test $? -eq 2   # exit 2 = no gate records yet, allowed
+    - python3 hybrid/scripts/station-audit.py || test $? -eq 2

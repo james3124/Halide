@@ -1,0 +1,27 @@
+[Unit]
+Description=HALIDE alarm bridge (RTC wake + time-vote re-fire)
+Documentation=file:hybrid-os-plan/05-debian-systemd-dual-init.md
+After=halide-android.service time-sync.target
+Requires=dev-rtc0.device
+PartOf=halide-android.service
+Slice=halide.slice
+
+[Service]
+Type=simple
+User=halide-bridges
+ExecStart=/usr/sbin/halide-alarm-bridge --vote /usr/sbin/halide-time-vote
+Restart=on-failure
+RestartSec=3s
+CPUWeight=200
+MemoryHigh=80M
+MemoryMax=120M
+TasksMax=40
+OOMScoreAdjust=0
+# Alarm path never waits for NTP: RTC match fires even in CLOCK_HOLDOVER
+# (ch.05 section 29). DST/suspend re-fire asserted by tests/time-jump.sh.
+SystemCallFilter=@system-service @clock
+SystemCallErrorNumber=EPERM
+NoNewPrivileges=yes
+
+[Install]
+WantedBy=halide.slice

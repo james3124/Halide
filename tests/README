@@ -1,0 +1,6 @@
+# TESTS
+Exit 0=pass, 1=fail, 2=skip/error.
+Run: sh ci/jobs-mr.sh
+Phone: run from hybrid/ dir.
+See ci/jobs-mr.sh for suite list.
+Logs under logs/.

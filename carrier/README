@@ -1,0 +1,5 @@
+# Carrier matrix (text-only)
+Schema ref: ch.07 S11 per-carrier APN/VoLTE/VoWiFi rows.
+Files: telephony/carrier/*.yaml; this dir holds matrix docs only.
+Gate: example.yaml validates before adding new carrier.
+No IMSI/secrets here; public APN only. Owner: telephony; update on test pass.

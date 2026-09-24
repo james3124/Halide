@@ -1,0 +1,26 @@
+[Unit]
+Description=HALIDE backup export (contacts/SMS/photos + restic home snapshot)
+Documentation=file:hybrid-os-plan/05-debian-systemd-dual-init.md
+After=halide-android.service
+Wants=halide-android.service
+Slice=halide.slice
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart=/usr/sbin/halide-backup --export auto
+TimeoutSec=1800s
+# Transient bulk class (ch.05 section 25): abort + rollback on breach, user
+# sees "retry on Wi-Fi/charger", never a half-written backup.
+CPUWeight=300
+IOWeight=200
+MemoryHigh=300M
+MemoryMax=500M
+TasksMax=100
+ManagedOOMPreference=kill
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+NoNewPrivileges=yes
+
+[Install]
+WantedBy=multi-user.target

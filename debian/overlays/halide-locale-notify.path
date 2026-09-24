@@ -1,0 +1,11 @@
+[Unit]
+Description=HALIDE locale/timezone change trigger
+Documentation=file:hybrid-os-plan/05-debian-systemd-dual-init.md
+
+[Path]
+PathChanged=/etc/locale.conf
+PathChanged=/etc/timezone
+Unit=halide-locale-notify.service
+
+[Install]
+WantedBy=multi-user.target

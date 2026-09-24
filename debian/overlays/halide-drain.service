@@ -1,0 +1,19 @@
+[Unit]
+Description=HALIDE container drain (shutdown order is a contract, ch.05 §26)
+Before=halide-android.service halide-prop-bridge.service halide-ril-bridge.service halide-composer.service halide-bootstage.service halide-ota-finalize.service
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+TimeoutStopSec=45s
+# Drain ladder (ch.05 §26): T+0 PrepareForShutdown+ACTION_SHUTDOWN (5s flush),
+# T+5 freeze MO dials/SMS ("Shutting down" queue variant), T+5-20 lxc-stop -t 15
+# (SIGPWR->SIGTERM->SIGKILL; wedged = DRAIN_KILL9 metric), T+20-30 MM
+# --modem-disable (emergency-callback window respected), T+30-40 unmount binds +
+# LUKS sync, T+40 journal flush + pstore marker SHUTDOWN-CLEAN <boot-id>.
+ExecStart=/bin/true
+ExecStop=/usr/sbin/halide-drain
+
+[Install]
+WantedBy=multi-user.target

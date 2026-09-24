@@ -1,0 +1,80 @@
+#!/bin/sh
+# halide-backup -- Settings -> Backup export (ch.05 section 12).
+# Source: hybrid/debian/scripts/halide-backup (installed to /usr/sbin/, run by
+# halide-backup.service). Exports contacts (vCard), SMS (XML), call log (CSV),
+# photos file list + hashes, restic snapshot of /home/halide (excluding caches),
+# and an Android-side manifest (pm list packages + versions).
+# NOT backed up v1 (stated in the export report): app-internal Android data
+# without a backup agent. Restore reverses with version-skew warnings
+# (newer->older blocked with explanation).
+# Exit contract: 0 exported / 1 export failed (rolled back) / 2 nothing to do.
+set -eu
+MODE="auto"
+CHECKPOINT_ONLY=0
+OUT="${HALIDE_BACKUP_OUT:-/var/lib/halide/backup}"
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --export) MODE="$2"; shift 2 ;;
+    --out) OUT="$2"; shift 2 ;;
+    --checkpoint-only) CHECKPOINT_ONLY=1; shift ;;
+    -h|--help) echo "usage: $0 [--export auto|full] [--out DIR] [--checkpoint-only]"; exit 0 ;;
+    *) echo "ERR bad-arg $1" >&2; exit 1 ;;
+  esac
+done
+
+if [ "$CHECKPOINT_ONLY" -eq 1 ]; then
+  # Drain-path reuse (ch.05 section 26 T+0): fsync queues + checkpoint DBs.
+  sync
+  echo "halide-backup: checkpoint fsync done"
+  exit 0
+fi
+
+mkdir -p "$OUT"
+STAMP="$(date +%Y%m%d-%H%M%S)"
+DEST="$OUT/halide-backup-$STAMP"
+mkdir -p "$DEST"
+
+# Contacts (vCard) + SMS (XML) + call log (CSV): host is store of record v1
+# for SMS (ch.05 section 9); Android provider is a read-only mirror.
+echo "halide-backup: exporting contacts/SMS/call-log to $DEST"
+if command -v halide-chats-export >/dev/null 2>&1; then
+  halide-chats-export --vcard "$DEST/contacts.vcf" --sms-xml "$DEST/sms.xml" --calls-csv "$DEST/calls.csv" || exit 1
+else
+  echo "note: halide-chats-export absent (builder only), writing manifest placeholders" >&2
+  : > "$DEST/contacts.vcf"
+  : > "$DEST/sms.xml"
+  : > "$DEST/calls.csv"
+fi
+
+# Photos file list + hashes (content via restic snapshot below).
+if [ -d /home/halide/Pictures ]; then
+  (cd /home/halide/Pictures && find . -type f | sort | while read f; do
+    echo "$(sha256sum "$f" 2>/dev/null || echo "unreadable $f")"
+  done) > "$DEST/photos.sha256" || exit 1
+else
+  : > "$DEST/photos.sha256"
+fi
+
+# Android-side manifest: package list + versions (data only for apps with
+# backup agents; gap documented in the export report).
+if command -v lxc-attach >/dev/null 2>&1 && lxc-info -n android 2>/dev/null | grep -qi running; then
+  lxc-attach -n android -- pm list packages -f 2>/dev/null > "$DEST/android-packages.txt" || : > "$DEST/android-packages.txt"
+else
+  : > "$DEST/android-packages.txt"
+fi
+
+# restic snapshot of /home/halide excluding caches (bulk class, ch.05 sec 25).
+if command -v restic >/dev/null 2>&1; then
+  restic backup --exclude-caches /home/halide 2>/dev/null || exit 1
+else
+  echo "note: restic absent (builder only), home snapshot skipped" >&2
+fi
+
+{
+  echo "backup=$STAMP"
+  echo "contacts=$(wc -l < "$DEST/contacts.vcf" 2>/dev/null || echo 0)-lines"
+  echo "photos=$(wc -l < "$DEST/photos.sha256" 2>/dev/null || echo 0)-files"
+  echo "NOT-BACKED-UP: app-internal Android data without backup agent (v1 gap)"
+} > "$DEST/report.txt"
+echo "halide-backup: export complete $DEST"
+exit 0

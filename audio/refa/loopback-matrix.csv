@@ -1,0 +1,16 @@
+scenario,path,xrun_total,verdict,notes
+# TEMPLATE for tests/audio-loopback.sh OUT (logs/audio-loopback-<ts>.csv shape).
+# Harness drives halide-audio-drive --scenario <quiet|street|car|speaker|headset>
+# --path <host-only|bridged> (lab, HALIDE_LAB paths). Gates: host-only xrun==0
+# wired (ch05 s31); bridged budget per latency-budget.csv; 0 one-way-audio in 50.
+# Archive bundles to audio/<sku>/results/<date>/ per modem-audio-loopback-tests.
+quiet,host-only,TODO-measured,TODO,cmts loopback first (isolates gains from bridge)
+quiet,bridged,TODO,TODO,
+street,host-only,TODO,TODO,
+street,bridged,TODO,TODO,
+car,host-only,TODO,TODO,SCO params logged
+car,bridged,TODO,TODO,
+speaker,host-only,TODO,TODO,double-talk 10s no howl
+speaker,bridged,TODO,TODO,
+headset,host-only,TODO,TODO,
+headset,bridged,TODO,TODO,

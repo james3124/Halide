@@ -1,0 +1,4 @@
+reboots,app_crashes,missed_calls,missed_sms,battery_eod,photos_ok,worst_thing
+0,none,0/4,0/11,62,y,scroll stutter in drawer
+0,epiphany once,0/3,0/9,58,y,none
+0,none,0/5,0/12,71,y,SAMPLE rows - synthetic fixture for review-sample.py only

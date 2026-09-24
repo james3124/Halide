@@ -1,0 +1,48 @@
+# halide-android -- AppArmor profile for the Android container (LXC) boundary
+# Parent: ch.08 S4 (MAC coexistence) + S10 (host enforcement) + S31 (allowlist row u:r:container:s0)
+# Canonical path: security/apparmor/halide-android
+# Harness alias: security/apparmor-lxc-android (symlink, same file -- tests/apparmor-seccomp.sh reads it)
+# Owner: Security + Platform * Review: quarterly with avc-audit
+# Rule: every exception carries BUG + EXPIRY + TEST (ch.08 S4); complain-mode needs a dated 48h tag.
+
+#include <tunables/global>
+
+profile halide-android flags=(attach_disconnected,mediate_deleted) {
+  #include <abstractions/base>
+  #include <abstractions/lxc/container-base>
+
+  # Container helpers the boundary needs (S31 bounded allow row)
+  /usr/bin/lxc-start ix,
+  /usr/lib/**/lxc-** ix,
+  /run/halide/bridges/* rw,
+  /run/halide/sockets/* rw,
+  /dev/binderfs/** rw,
+  /dev/dri/** rw,
+  /dev/snd/* rw,
+
+  # Calibration / modem NV are NEVER writable from the container (neverallow.te N-01..N-03)
+  deny /dev/persist* rwklx,
+  deny /dev/block/**/persist* rwklx,
+  deny /dev/block/**/efs* rwklx,
+  deny /dev/block/**/modemst* rwklx,
+  deny /dev/snd/* w,
+  deny /dev/diag rwklx,
+  deny /sys/kernel/debug/** rwklx,
+
+  # No ptrace across the boundary (Yama scope 1 + seccomp ptrace-deny mirror it)
+  deny ptrace,
+  deny capability sys_admin,
+  deny capability sys_ptrace,
+  deny capability sys_rawio,
+  deny capability net_admin,
+  deny capability net_raw,
+  deny network raw,
+
+  # Container must never execute host bridge binaries directly (neverallow.te N-04)
+  deny /usr/lib/halide/bridges/** x,
+  deny /usr/lib/halide/composer/** x,
+
+  # Audit boundary crossings verbosely
+  audit ptrace,
+  audit capability sys_admin,
+}

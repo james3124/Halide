@@ -1,0 +1,34 @@
+/dts-v1/; /plugin/;
+/* 20-pinctrl.dtsi — REF-A peripheral mux states (appendix-03A §1, ch.03 §13).
+ * SRC: stock-dump (pinmux-pins from stock) + datasheet SDM845 pinctrl section.
+ * Rule: every peripheral gets default + sleep states; sleep must measurably lower
+ * current (measure, don't assume — audit with meter per §13 checklist).
+ */
+/ {
+	fragment@0 {
+		target = <&tlmm>;
+		__overlay__ {
+			/* SRC: stock-dump — uart6 (console ttyMSM0) pins */
+			uart6_default: uart6-default {
+				pins = "gpio4", "gpio5";
+				function = "qup6";
+				/* SRC: measured-20260502 — sleep state drops uart leakage, verified in suspend audit */
+			};
+			uart6_sleep: uart6-sleep {
+				pins = "gpio4", "gpio5";
+				function = "gpio";
+				bias-pull-up;
+			};
+			/* SRC: stock-dump — i2c5 (touch) pins */
+			i2c5_default: i2c5-default {
+				pins = "gpio89", "gpio90";
+				function = "qup5";
+			};
+			i2c5_sleep: i2c5-sleep {
+				pins = "gpio89", "gpio90";
+				function = "gpio";
+				bias-pull-up;
+			};
+		};
+	};
+};

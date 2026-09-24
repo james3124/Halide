@@ -1,0 +1,5 @@
+ts,pid,total,dmabuf,syncfile,gem_est,binder,eventfd,missed_vblank,stalls
+# TEMPLATE - appended by halide-fd-soak --duration 3600 --sample 30 (ch06 s29).
+# Workload loop: video 10min + scroll 5min + static 5min rotating.
+# Static phase: PSR-hold fences release within 1 frame of PSR-EXIT; leaks never release.
+# Report: halide-fd-report fd-soak.csv pastes verdict into release-notes FD-delta cell.

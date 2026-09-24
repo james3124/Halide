@@ -1,0 +1,19 @@
+// SAMPLE evidence for gate record 1-2-20260814-REF-A — Phase-1 exit bar
+// REDACTED: `evtest /dev/input/event2` touch excerpt on REF-A (HALIDE-A1), coordinates generic.
+// Build: halide-20260814-a3f9c1e2b4d6
+Input driver version: 1.0.1
+Device name: FT8719 touchscreen
+Supported events: EV_SYN EV_KEY EV_ABS
+  ABS_MT_POSITION_X: 0..1080
+  ABS_MT_POSITION_Y: 0..2340
+  ABS_MT_TRACKING_ID: 0..15
+  BTN_TOUCH: down/up
+Event lines:
+[  9541.220311] EV_ABS ABS_MT_TRACKING_ID 00000000
+[  9541.220318] EV_ABS ABS_MT_POSITION_X 0000021c
+[  9541.220321] EV_ABS ABS_MT_POSITION_Y 00000474
+[  9541.220324] EV_KEY BTN_TOUCH DOWN
+[  9541.220327] EV_SYN SYN_REPORT 00000000
+[  9541.301014] EV_KEY BTN_TOUCH UP
+[  9541.301020] EV_SYN SYN_REPORT 00000000
+// Expected: touch events stream, BTN_TOUCH down/up cycle clean (10-finger sanity in IQC)

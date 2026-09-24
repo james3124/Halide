@@ -1,0 +1,63 @@
+#!/bin/sh
+# halide-android-prepare -- container preflight for halide-android.service.
+# Source: hybrid/debian/scripts/halide-android-prepare (installed to /usr/sbin/).
+# Exit contract: 0 ready / 1 container failed (degraded-banner armed) / 2 infra skip.
+# ch.05 section 2: ExecStartPre with --timeout; 3 rapid crashes stop auto-restart
+# and Phosh shows "Android unavailable" + one-tap log export (never boot-loops).
+set -eu
+TIMEOUT=150
+BANNER=/run/halide/degraded-banner
+usage() { echo "usage: $0 [--timeout SECS] [--banner PATH]" >&2; }
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --timeout) TIMEOUT="$2"; shift 2 ;;
+    --banner) BANNER="$2"; shift 2 ;;
+    -h|--help) usage; exit 0 ;;
+    *) echo "ERR bad-arg $1" >&2; usage; exit 1 ;;
+  esac
+done
+
+# Device nodes first: scoped Requires= in the unit covers binder/dri; ashmem
+# is Wants (graceful). Missing binder here means the kernel lacks the driver.
+if [ ! -e /dev/binder ] && [ ! -d /dev/binderfs ]; then
+  echo "halide-android-prepare: no binder node (needs dev-binder.device)" >&2
+  exit 2
+fi
+if ! command -v lxc-start >/dev/null 2>&1; then
+  echo "halide-android-prepare: lxc-start absent (builder only)" >&2
+  exit 2
+fi
+# Container image version check (ch.04 section 15): refuse stale pairings.
+if command -v getprop >/dev/null 2>&1; then
+  VER="$(getprop ro.halide.container_version 2>/dev/null || echo "")"
+  if [ -n "$VER" ] && [ -f /etc/halide-release ] && ! grep -q "$VER" /etc/halide-release 2>/dev/null; then
+    echo "halide-android-prepare: container version $VER not in /etc/halide-release" >&2
+    mkdir -p "$(dirname "$BANNER")"
+    echo "Android unavailable (version mismatch) - Export logs" > "$BANNER"
+    exit 1
+  fi
+fi
+# boot_completed poll: bounded by --timeout (default 150s covers the 120s
+# budget + margin, ch.05 section 18). Polling because boot_completed has no
+# host-side uevent to wait on.
+if command -v getprop >/dev/null 2>&1; then
+  i=0
+  while [ "$i" -lt "$TIMEOUT" ]; do
+    if [ "$(getprop sys.boot_completed 2>/dev/null || echo "")" = "1" ]; then
+      echo "halide-android-prepare: boot_completed=1 after ${i}s"
+      rm -f "$BANNER"
+      exit 0
+    fi
+    # WHY-NOT-EVENT: boot_completed is an Android property with no host uevent;
+    # poll 2s cadence keeps preflight inside the 150s start-timeout budget.
+    sleep 2
+    i=$((i + 2))
+  done
+  echo "halide-android-prepare: boot_completed timeout ${TIMEOUT}s, degraded banner armed" >&2
+  mkdir -p "$(dirname "$BANNER")"
+  echo "Android unavailable - Export logs" > "$BANNER"
+  exit 1
+fi
+echo "halide-android-prepare: preflight static OK (live poll device-only)"
+exit 0

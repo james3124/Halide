@@ -1,0 +1,11 @@
+# Haptics redundancy matrix (accessibility-test-plan S3). Every critical alert has
+# >=2 channels (visual + haptic and/or audio). Procedure: trigger each with the
+# vibration motor on/off; haptics-off requires a persistent visual banner;
+# display-off requires distinct call (repeating) vs SMS (double-pulse) patterns.
+# Motor latency tap-to-buzz <50ms. Result cells: TODO-measured per release.
+alert,visual,haptic,audio,haptics_off_ok,display_off_pattern,latency_ms,result
+incoming-call,banner,TRUE,ringtone,TRUE,repeating,TODO-measured,TODO-measured
+sms-arrival,banner,TRUE,tone,TRUE,double-pulse,TODO-measured,TODO-measured
+low-battery-15pct,banner,TRUE,tone,TRUE,double-pulse,TODO-measured,TODO-measured
+ota-reboot-prompt,modal,TRUE,tone,TRUE,repeating,TODO-measured,TODO-measured
+permission-prompt,modal,TRUE,none,TRUE,double-pulse,TODO-measured,TODO-measured

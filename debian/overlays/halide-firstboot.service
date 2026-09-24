@@ -1,0 +1,23 @@
+[Unit]
+Description=HALIDE first boot provisioning wizard (runs once)
+Documentation=file:hybrid-os-plan/runbook-firstboot.md
+ConditionFirstBoot=yes
+After=systemd-repart.service local-fs.target
+Before=halide-android.service halide-repart-provision.service
+Requires=sys-devices-virtual-misc-hw_random.device
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+# Ordered steps (runbook-firstboot section 1): machine-id + SSH keys, userdata
+# expand + LUKS, hostname/locale suggestion (never silent apply), lockscreen
+# PIN mandatory before modem enable, container first start (boot_completed
+# <=120s, degraded-banner path), telemetry explicit opt-in (skip = declined).
+ExecStart=/usr/sbin/halide-firstboot-check --stage all --budget 360
+TimeoutSec=400s
+StandardOutput=journal+console
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+
+[Install]
+WantedBy=sysinit.target

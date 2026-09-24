@@ -1,0 +1,59 @@
+#!/bin/bash
+# halide-android-prepare - pre-start gate (ch.04 S15 + S17 companion).
+# Runs before every container start: mounts binderfs if absent, checks
+# /dev/dri, seeds /run/halide/* sockets with correct perms, verifies image
+# version matches host (/etc/halide-release vs container build.prop
+# halide.version - refuse on major mismatch with banner, never boot mixed
+# versions silently), diffs /proc/modules vs vendor_module_list.txt.
+# Phone-safe: host-side only; on a builder without the LXC tree it SKIP-exits.
+# Exit 0 ready / 1 refuse-with-banner (fail closed) / 2 no input (not a host).
+set -eu
+SKU="${1:-refa}"
+HERE="$(dirname "$0")"
+ROOTFS="/var/lib/lxc/android/rootfs"
+LIST="$HERE/vendor_module_list.txt"
+[ -d /var/lib/lxc/android ] || { echo "SKIP: no /var/lib/lxc/android (host only)"; exit 2; }
+[ -f "$LIST" ] || { echo "FAIL-INFRA: vendor_module_list.txt missing"; exit 2; }
+
+refuse() { echo "REFUSE: $1"; echo "halide-android-prepare: REFUSE ($1)"; exit 1; }
+
+# 1. binderfs mounted (fault-injection S22: dropped mount must refuse, never half-boot)
+mountpoint -q /dev/binderfs 2>/dev/null \
+  || mount -t binder binder /dev/binderfs 2>/dev/null \
+  || refuse "binderfs mount absent (bind-mount /dev/binderfs first)"
+# 2. GPU node present
+[ -e /dev/dri/renderD128 ] || [ -e /dev/dri/card0 ] \
+  || refuse "/dev/dri absent (composer has no backend)"
+# 3. bridge sockets seeded with perms (audio proxy checks SO_PEERCRED, S8)
+mkdir -p /run/halide
+for S in audio-proxy power-hint memory-pressure gnss.nmea; do
+  [ -e "/run/halide/$S" ] || : # created by owning daemons; presence asserted at health time
+done
+chmod 0755 /run/halide
+# 4. version guard: host vs container major must match (S15, S24 factory-ahead)
+HOST_VER="$(cat /etc/halide-release 2>/dev/null | grep -o '[0-9]*\.[0-9]*\.[0-9]*' | head -1 || true)"
+CONT_VER="$(grep '^ro.halide.version=' "$ROOTFS/system/build.prop" 2>/dev/null | cut -d= -f2 || true)"
+if [ -n "${HOST_VER:-}" ] && [ -n "${CONT_VER:-}" ]; then
+  [ "${HOST_VER%%.*}" = "${CONT_VER%%.*}" ] \
+    || refuse "version skew host=$HOST_VER container=$CONT_VER (complete OTA or rollback both slots; never --allow-mismatch on user builds)"
+else
+  echo "note: version guard deferred (missing /etc/halide-release or container build.prop)"
+fi
+# 5. vendor module list diff (S17): missing = refuse, extra = warn + journal
+if [ -r /proc/modules ]; then
+  MISSING=0
+  while read -r MOD _VER _SHA _rest; do
+    case "$MOD" in \#*|"") continue ;; esac
+    grep -q "^${MOD%%.ko} " /proc/modules 2>/dev/null \
+      || { echo "MISSING-MODULE: $MOD"; MISSING=1; }
+  done < "$LIST"
+  [ "$MISSING" = 0 ] || refuse "vendor modules missing (see MISSING-MODULE lines above)"
+  while read -r LINE; do
+    M="${LINE%% *}"; M="${M%.ko}"
+    grep -q "^$M " "$LIST" 2>/dev/null || echo "EXTRA_MODULE: $M (build drifted - investigate, not ignored)"
+  done < /proc/modules
+else
+  echo "note: /proc/modules unreadable - module gate deferred (lab kernels only)"
+fi
+echo "halide-android-prepare: READY (sku=$SKU)"
+exit 0

@@ -1,0 +1,6 @@
+# fd baseline per standard workload (ch06 s29) - TEMPLATE
+# Workload: graphics/workload-jank.sh + drawer x10 (same N every compare)
+# Format: surfaces:N total_fd:M dmabuf:K syncfile:J gem:G binder:B eventfd:E
+# TODO-measured: fill one line per standard workload run on sacrificial REF-A.
+# Example shape (NOT data): surfaces:3 total_fd:41 dmabuf:6 syncfile:6
+surfaces:TODO total_fd:TODO dmabuf:TODO syncfile:TODO gem:TODO binder:TODO eventfd:TODO

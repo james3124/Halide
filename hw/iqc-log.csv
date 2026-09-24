@@ -1,0 +1,5 @@
+serial,date,adapter,cable,result,notes
+SAMPLE-HALIDE-A1,2026-08-01,UART-GOLDEN-01,CBL-GOLDEN-01,PASS,stock boot log archived; backup sha verified
+SAMPLE-HALIDE-A2,2026-08-02,UART-GOLDEN-02,CBL-GOLDEN-02,PASS,getvar all archived; persist backup restorable
+SAMPLE-HALIDE-A3,2026-08-05,UART-GOLDEN-01,CBL-GOLDEN-03,FAIL,swollen battery — quarantine shelf + photo; RMA loopback opened
+SAMPLE-HALIDE-B1,2026-08-07,UART-GOLDEN-02,CBL-GOLDEN-01,CONDITIONAL,weak vibrator — haptics tests exempt (BUG-lab-118)

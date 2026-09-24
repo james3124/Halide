@@ -1,0 +1,17 @@
+# packages.host — WHY-commented, curated for 4GB/32GB (ch.05 §8, low-spec §4)
+# Each line: package # WHY (PSS cost or gate). New daemon must show PSS or CI fails.
+
+systemd # PID1, required
+udev # device nodes for binder/ashmem/graphics
+network-manager # owns Wi-Fi/LTE single-stack (FR-04)
+modemmanager # host owns modem (ch.07 §1)
+pipewire # single audio server (FR-05)
+wireplumber # pipewire session policy
+phosh # primary home, ≤450MB idle budget
+phoc # compositor
+feedbackd # haptics for permission/call alerts (a11y)
+lxc # Android container runtime
+cryptsetup # LUKS2 userdata (AES-256-XTS)
+veritysetup # dm-verity strict
+tpm2-tools # reserved, no daemon by default (keep PSS low)
+# NO: full GNOME, tracker-miners, cups, snapd — each breaks 4GB budget, needs Arch sign

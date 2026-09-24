@@ -1,0 +1,5 @@
+trigger: unknown-trigger
+frozen_utc: 2026-09-09T11:57:14Z
+manifest_sha: 2d10db3cb0dbf299
+retention_days: 90
+next: open qa/digs/20260909-unknown-trigger/DIG.md per ch.10 §25 (hypotheses need disproving tests)

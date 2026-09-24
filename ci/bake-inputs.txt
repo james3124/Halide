@@ -1,0 +1,14 @@
+# bake-inputs.txt -- normative input list for scripts/bake-report.sh (ch.09 S20).
+# bake-report.sh concatenates logs/*.log tail sections; the inputs below are the
+# minimum evidence set for a meaningful bake report. Missing inputs appear as
+# "(no logs/*.log yet)" notes, never as invented numbers. ASCII only.
+#
+# Format: one filename pattern per line; # comments ignored by bake-report.sh.
+logs/harness-*.log
+logs/suspend-*.log
+logs/socket-audit-*.log
+logs/permission-sync-*.log
+logs/vpn-leak-*.log
+logs/power-smoke-*.log
+logs/build-*.json
+logs/ota-sizes-*.json

@@ -1,0 +1,14 @@
+# REDACT.rules - redacted-only log pipeline contract (ch.01 S294, ch.09 S4).
+# Evidence path for DoD-logs in qa/coverage-map.csv. Every tests/*.sh honors
+# --redact (exit contract ch.10 S7); uploads without redaction fail the suite.
+# Companion: support/redact-rules.conf (pattern list) + tests/qmi-redact.sh (audit).
+
+rule: default-on (opt-out --no-redact requires typed reason + eng build)
+rule: IMSI/IMEI/ICCID/phone-number regexes stripped before commit or upload
+rule: QMI TLV denylist per ch.07 S7
+rule: Wi-Fi BSSID masked to OUI (BSSIDs locate people)
+rule: coordinates scrubbed to <COORD> on --redact verdict lines
+rule: full logcat main never collected (tombstones + FATAL slice only)
+rule: userdata files/photos/SMS bodies/keystrokes never collected
+rule: planted-IMEI spot-check passes before any pipeline change lands
+rule: raw bundles live in quarantine-store with expiry, never in git

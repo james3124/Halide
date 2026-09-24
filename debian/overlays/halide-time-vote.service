@@ -1,0 +1,24 @@
+[Unit]
+Description=HALIDE time-source vote (NTP vs NITZ vs GNSS vs manual)
+Documentation=file:hybrid-os-plan/05-debian-systemd-dual-init.md
+After=time-sync.target halide-locale-notify.service
+Requires=dev-rtc0.device
+Slice=halide.slice
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+# Vote algorithm (ch.05 section 29): manual wins when Automatic off
+# (TIME_HOLD_MANUAL); else NTP wins when fresh, NITZ steps with TIME_SOURCE
+# tag when NTP stale, else CLOCK_HOLDOVER banner. Divergence >5min raises
+# TIME_DIVERGE, never a silent step.
+ExecStart=/usr/sbin/halide-time-vote --daemon-once
+TimeoutSec=60s
+# BUDGET: event-driven on source change + once per boot; no periodic wake
+# (ch.05 section 21).
+SystemCallFilter=@system-service @clock
+SystemCallErrorNumber=EPERM
+NoNewPrivileges=yes
+
+[Install]
+WantedBy=multi-user.target

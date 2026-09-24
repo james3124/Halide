@@ -1,0 +1,15 @@
+# audit.rules -- host/container audit ruleset (threat-model S2 Repudiation row)
+# Owner: Security * Committed; exploit leaves traces by construction.
+# Covers: module-load, mount, ptrace, keyring ops, container canary access.
+
+-w /sbin/insmod -p x -k module-load
+-w /sbin/rmmod -p x -k module-load
+-w /sbin/modprobe -p x -k module-load
+-a always,exit -F arch=b64 -S init_module -S finit_module -S delete_module -k module-load
+-a always,exit -F arch=b64 -S mount -S umount2 -k mounts
+-a always,exit -F arch=b64 -S ptrace -k ptrace
+-a always,exit -F arch=b64 -S add_key -S request_key -S keyctl -k keyring
+-w /root/.halide-canary -p war -k container-canary
+-w /userdata/.halide/lockstate -p war -k lockstate
+-w /run/halide/sockets/ -p war -k bridge-sockets
+-e 2

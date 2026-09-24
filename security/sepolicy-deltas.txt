@@ -1,0 +1,7 @@
+# sepolicy-deltas.txt — allowlist sample only (phone-safe text, ch.04 §14)
+allow halide_ril radio_device:chr_file { read write ioctl };
+allow halide_prop property_socket:sock_file { write };
+allow halide_audio audio_device:chr_file { read write };
+allow halide_perm permission_service:service_manager { find };
+allow halide_composer display_device:chr_file { read write };
+# NEVERALLOW: no untrusted_app execmem, no cowboy allows; every allow needs Arch review

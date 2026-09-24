@@ -1,0 +1,28 @@
+[Unit]
+Description=HALIDE Android container (LXC, managed)
+After=network.target
+Requires=dev-binder.device
+Wants=dev-ashmem.device
+# ch.05 §25 binding table (outer container row) + Slice layout §25
+Slice=halide.slice
+
+[Service]
+Type=simple
+ExecStartPre=/usr/bin/test -e /dev/binder -a -e /dev/ashmem
+ExecStart=/usr/bin/lxc-start -n android -F
+ExecStop=/usr/bin/lxc-stop -n android -t 15
+Restart=on-failure
+RestartSec=5s
+StartLimitBurst=3
+StartLimitIntervalSec=60s
+# Outer budget — host limit always wins on conflict (ch.05 §25);
+# inner lxc.cgroup2.* delegates within it, lmkd kills inside first.
+CPUWeight=400
+MemoryHigh=75%
+MemoryMax=85%
+TasksMax=800
+# Outer OOM preference avoid (ch.05 §25): breach -> lxc-stop --kill + §2 banner
+ManagedOOMPreference=avoid
+
+[Install]
+WantedBy=multi-user.target

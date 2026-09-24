@@ -1,0 +1,93 @@
+<compatibility-matrix version="1.0" type="framework">
+  <!-- device/halide/refa/compatibility_matrix.xml - framework requirements
+       (ch.04 S19). VTS Treble subset (VtsTrebleVintfTest) is in the ch.10
+       allowlist, not optional: N-1 vendor + N system must at least parse,
+       tested by checkvintf check-compat per bump MR (S24). -->
+  <kernel version="6.6.51" />
+  <sepolicy>
+    <sepolicy-version>33</sepolicy-version>
+  </sepolicy>
+  <avb>
+    <vbmeta-version>2.0</vbmeta-version>
+  </avb>
+  <hal format="hidl" optional="false">
+    <name>android.hardware.audio</name>
+    <version>7.0-7.1</version>
+    <interface>
+      <name>IDevicesFactory</name>
+      <instance>primary</instance>
+    </interface>
+  </hal>
+  <hal format="hidl" optional="false">
+    <name>android.hardware.camera.provider</name>
+    <version>2.6-2.7</version>
+    <interface>
+      <name>ICameraProvider</name>
+      <instance>halide_0</instance>
+    </interface>
+  </hal>
+  <hal format="hidl" optional="false">
+    <name>android.hardware.sensors</name>
+    <version>2.0-2.1</version>
+    <interface>
+      <name>ISensors</name>
+      <instance>multihal</instance>
+    </interface>
+  </hal>
+  <hal format="hidl" optional="false">
+    <name>android.hardware.gnss</name>
+    <version>2.0-2.1</version>
+    <interface>
+      <name>IGnss</name>
+      <instance>default</instance>
+    </interface>
+  </hal>
+  <hal format="hidl" optional="false">
+    <name>android.hardware.radio</name>
+    <version>1.5-1.6</version>
+    <interface>
+      <name>IRadio</name>
+      <instance>slot1</instance>
+    </interface>
+  </hal>
+  <hal format="hidl" optional="true">
+    <name>android.hardware.drm</name>
+    <version>1.3-1.4</version>
+    <interface>
+      <name>IDrmFactory</name>
+      <instance>widevine</instance>
+    </interface>
+  </hal>
+  <hal format="aidl" optional="false">
+    <name>android.hardware.light</name>
+    <version>1</version>
+    <interface>
+      <name>ILights</name>
+      <instance>default</instance>
+    </interface>
+  </hal>
+  <hal format="aidl" optional="false">
+    <name>android.hardware.vibrator</name>
+    <version>1</version>
+    <interface>
+      <name>IVibrator</name>
+      <instance>default</instance>
+    </interface>
+  </hal>
+  <hal format="aidl" optional="false">
+    <name>android.hardware.health</name>
+    <version>1</version>
+    <interface>
+      <name>IHealth</name>
+      <instance>default</instance>
+    </interface>
+  </hal>
+  <hal format="aidl" optional="false">
+    <name>android.hardware.usb</name>
+    <version>1</version>
+    <interface>
+      <name>IUsb</name>
+      <instance>default</instance>
+    </interface>
+  </hal>
+</compatibility-matrix>

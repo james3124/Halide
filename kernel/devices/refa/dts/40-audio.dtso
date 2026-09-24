@@ -1,0 +1,20 @@
+/dts-v1/; /plugin/;
+/* 40-audio.dtsi — REF-A WCD934x + WSA881x + mic topology + jack (appendix-03A §1).
+ * SRC: stock-dump (sound card routing) + measured tinymix baseline (audio/<sku>/tinymix-baseline.txt).
+ * Machine quirks that can't upstream live in vendor_modules/ with UPSTREAMING.md (§4).
+ */
+/ {
+	fragment@0 {
+		target = <&lpass>;
+		__overlay__ {
+			status = "okay"; /* SRC: stock-dump */
+		};
+	};
+	fragment@1 {
+		target = <&wcd934x>;
+		__overlay__ {
+			status = "okay"; /* SRC: stock-dump — mic bias + jack detect routing */
+			qcom,micbias1-microvolt = <1800000>; /* SRC: stock-dump */
+		};
+	};
+};

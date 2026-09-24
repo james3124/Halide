@@ -1,0 +1,9 @@
+group,uid/gid,members,why
+halide,1000,"dana,iv,pw-user","primary host user; owns Wayland/PipeWire sessions (ch.05)"
+android-lxc,1500,"root(container),halide-android","LXC container runtime identity; maps to Android uids (ch.05 S19)"
+modem,2000,"halide-ril,modemmanager","dialout-class access to cdc-wdm0 + ril.sock; container denied (ch.07 S1)"
+display,3000,"halide-composer,phosh","dri/wayland socket access; composer bridge only (ch.06)"
+input,3001,"halide-composer,phoc","evdev read for touch/keys; no other daemons (ch.06 S7)"
+audio,3002,"pipewire,halide,android-lxc","snd/alsa device group; single server policy (ch.04)"
+wlan,3100,"network-manager","wifi ctrl; NM single-stack owner (FR-04)"
+backup,4000,"halide-backup","backup round-trip export path only (ch.10 S12)"

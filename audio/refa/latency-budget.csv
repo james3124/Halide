@@ -1,0 +1,7 @@
+path,sample_rate,frames_per_burst,period_count,period_frames,kernel_buf_ms,hal_proxy_ms,dsp_host_ms,total_roundtrip_ms,underrun_budget_per_hour
+DEEP_BUFFER,48000,TODO,TODO,TODO,TODO-measured,TODO,TODO,TODO,0
+VOICE_CALL,48000,TODO,TODO,TODO,TODO-measured,TODO,TODO,TODO,0
+MMAP_EXCLUSIVE,48000,TODO,TODO,TODO,TODO-measured,TODO,TODO,TODO,TODO-budget-row
+FAST,48000,TODO,TODO,TODO,TODO-measured,TODO,TODO,TODO,TODO-budget-row
+# REF-A SDM845 shape only - re-measure per SKU, never copy numbers (ch04 s36).
+# Counters: dumpsys media.audio_flinger snapshots archived audio/<sku>/xrun-<date>.txt.

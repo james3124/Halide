@@ -1,0 +1,11 @@
+preset,path,codec,response_delta_dB,thd_n_pct,insertion_loss_dB,alias_below_neg80dBFS,verdict
+pass-through,wired,S16LE-48k,TODO-measured,TODO,TODO,TODO,TODO
+flat,wired,S16LE-48k,TODO,TODO,TODO,TODO,TODO
+voice-clarity,wired,S16LE-48k,TODO,TODO,TODO,TODO,TODO
+bass-lite,wired,S16LE-48k,TODO,TODO,TODO,TODO,TODO
+BassBoost-ON,wired,S16LE-48k,MUST-FAIL-flatness,,,,NEGATIVE-CONTROL-rig-deaf-if-pass
+pass-through,bt,SBC-bitpool53,TODO,TODO,TODO,TODO,TODO-codec-footnoted
+# Bars: response +-1.5dB 100Hz-15kHz (+-3dB edges); THD+N <=0.1% wired, <=0.5% BT-SBC;
+# insertion 0+-0.5dB; 44.1k alias images <-80dBFS. BT rows without codec rejected.
+# Stimuli: audio/test-tones (pink 30s, sweep 20-20k 30s, 1kHz -3dBFS); gains 30/70/100%.
+# Status: UNMEASURED.

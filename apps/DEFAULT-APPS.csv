@@ -1,0 +1,10 @@
+package,action,owner
+android.intent.action.VIEW,ASK_HOST_FIRST,platform
+android.intent.action.DIAL,HANDLED_BY_HOST,platform
+android.intent.action.SENDTO,HANDLED_BY_HOST,platform
+android.media.action.IMAGE_CAPTURE,HANDLED_BY_HOST,platform
+android.settings.WIFI_SETTINGS,BRIDGE_TO_PANEL,platform
+android.settings.BLUETOOTH_SETTINGS,BRIDGE_TO_PANEL,platform
+android.settings.AIRPLANE_MODE_SETTINGS,BRIDGE_TO_PANEL,platform
+android.settings.APPLICATION_DETAILS,BRIDGE_TO_PANEL,platform
+android.intent.action.WEB_SEARCH,ASK_HOST_FIRST,platform

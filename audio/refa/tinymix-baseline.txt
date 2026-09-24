@@ -1,0 +1,5 @@
+HPOUTL Volume 100 (stub)
+HPOUTR Volume 100 (stub)
+ADC Capture Volume 12 (stub)
+DAC Playback Volume 160 (stub)
+Mic Boost Gain 2 (stub)

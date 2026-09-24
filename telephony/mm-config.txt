@@ -1,0 +1,6 @@
+# ModemManager ownership (text-only)
+MODEM_OWNER=ModemManager
+STACK=single-stack-only
+NOTE=no oFono/no custom RIL daemon alongside MM
+APN_REF=telephony/carrier/example.yaml; CARRIER_REF=carrier/README ch.07 S11
+GATE=ofono absent; mmcli -m any lists modem only

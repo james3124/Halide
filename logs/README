@@ -1,0 +1,3 @@
+# logs
+UART/boot logs land here as `<date>-<sku>-<issue>.txt`, redacted.
+Strip IMEI/IMSI before upload (see `support/LOG-HOWTO.md`).

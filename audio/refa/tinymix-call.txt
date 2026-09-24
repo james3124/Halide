@@ -1,0 +1,10 @@
+# tinymix call-path complement to tinymix-baseline.txt (ch04 s8 + appendix-04A s4)
+# Baseline holds media/host path; this file holds the CALL path delta per route.
+# Capture: tinymix contents > tinymix-call.txt during active call per routes.conf
+# route (HANDSET/SPEAKER/BT-SCO/WIRED-3.5MM). Diff baseline vs call on regression.
+# HANDSET earpiece gain: TODO-measured (mirrors call-gains.conf handset)
+# SPEAKER amp cap: TODO-measured (Xmax + thermal datasheet p. TODO)
+# MIC/EchoRef: TODO-measured per route (wrong-ref echo is the PESQ-killer)
+# SCO link params: TODO-measured (hsphfpd AG log excerpt, no secrets)
+# Sidetone: TODO-measured (re-measured per tuning-v1.md take)
+# Status: UNMEASURED - dump on lab unit during 5-call tune, never hand-edited gains.

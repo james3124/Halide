@@ -1,0 +1,9 @@
+# halide-touch-join template (ch06 s7/s30) - TEMPLATE, not gate data
+# Capture: halide-touch-trace --duration 300 --out touch-run-<date>/ (200 taps,
+# stylus 180 + finger 20 appendix; charger unplugged; night-light off).
+# Join: halide-touch-join --evtest evtest.log --present present.log --matrix hw/<sku>/input-matrix.conf
+# Header exact (scripts assert column order). delta_ms=(present_us-event_us)/1000.
+# excluded in 0|contaminated|palm|edge (rejected taps stay as rows, never vanish).
+# Gate: stylus p95 <100ms; finger appendix <120ms. Stats: graphics/touch-stats.py stats_v2.
+seq,tool,event_us,commit_us,present_us,delta_ms,surface,slot,excluded,note
+# TODO-measured: 200 rows. Worked example: graphics/ref-a/touch-latency-example.csv.

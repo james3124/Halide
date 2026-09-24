@@ -1,0 +1,26 @@
+{
+  "sku": "refb",
+  "soc": "refb-class",
+  "flashmap_version": 1,
+  "source_date_epoch_pinned": true,
+  "partitions": [
+    {"name": "boot", "size_B": 67108864, "image": "boot.img", "note": "64M kernel+ramdisk, avb chained"},
+    {"name": "vendor_boot", "size_B": 67108864, "image": "vendor_boot.img", "note": "64M vendor ramdisk"},
+    {"name": "dtbo", "size_B": 8388608, "image": "dtbo.img", "note": "8M overlay blob table"},
+    {"name": "vbmeta", "size_B": 8388608, "image": "vbmeta.img", "note": "8M avb top-level, rollback monotonic"},
+    {"name": "super", "size_B": 8589934592, "image": "super.img", "note": "8G dynamic partitions via lpmake device-size"},
+    {"name": "host_a", "size_B": 3758096384, "image": "host_a.img", "note": "3.5G Debian erofs release rootfs, slot A"},
+    {"name": "host_b", "size_B": 3758096384, "image": "host_b.img", "note": "3.5G Debian erofs release rootfs, slot B"},
+    {"name": "misc", "size_B": 4194304, "image": "misc.img", "note": "4M slot metadata init, never userdata"},
+    {"name": "userdata", "size_B": 0, "image": "userdata.img", "note": "empty template, ext4 encrypt, sized at flash"}
+  ],
+  "filesystem": {
+    "readonly": "erofs mkfs.erofs -C4096 -T$SOURCE_DATE_EPOCH",
+    "userdata": "ext4 mke2fs -O encrypt, empty template only"
+  },
+  "avb": {
+    "hashtree_per_logical": true,
+    "do_not_generate_fec": false,
+    "fec_note": "fec kept on refb; wear analysis in hw/refa, do not flip without ADR"
+  }
+}

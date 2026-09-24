@@ -1,0 +1,17 @@
+[Unit]
+Description=HALIDE container and bridges slice (cgroup v2 unified hierarchy)
+Documentation=file:hybrid-os-plan/05-debian-systemd-dual-init.md
+Before=slices.target
+
+[Slice]
+# systemd-as-PID1 owns the tree (ch.05 section 25): system.slice (host
+# daemons) + halide.slice (container + bridges + composer) + app.slice (user
+# Flatpak apps). Host limit always wins on conflict; Android lmkd manages
+# only within the delegated outer budget.
+CPUAccounting=yes
+MemoryAccounting=yes
+IOAccounting=yes
+TasksAccounting=yes
+
+[Install]
+WantedBy=multi-user.target

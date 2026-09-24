@@ -1,0 +1,24 @@
+{
+  "gate": "1-2",
+  "sku": "REF-A",
+  "build_id": "halide-20260814-a3f9c1e2b4d6",
+  "images": {
+    "host": "e3b0c442",
+    "system": "9f2c1184",
+    "boot": "7d4a55c1",
+    "vbmeta": "41be9f00"
+  },
+  "verdict": "PASS",
+  "signers": [
+    "BSP:ana:2026-08-14",
+    "QA:ken:2026-08-14"
+  ],
+  "log_bundle": "logs/gate-1-2-REF-A-20260814.tar.gz",
+  "waiver_adr": null,
+  "rerun_date": null,
+  "calibration_ids": [
+    "PSU-03-2026Q3",
+    "THERM-01-2026Q3"
+  ],
+  "quarantine_delta": "+0 (ch.10 S11 log)"
+}

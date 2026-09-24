@@ -1,0 +1,20 @@
+[Unit]
+Description=HALIDE composer (display, managed)
+After=halide-android.service
+Requires=halide-android.service
+Slice=halide.slice
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/halide-composer
+Restart=on-failure
+RestartSec=5s
+# ch.05 §25: foreground interactive — last to kill under pressure
+CPUWeight=800
+MemoryHigh=400M
+MemoryMax=600M
+TasksMax=150
+OOMScoreAdjust=-200
+
+[Install]
+WantedBy=multi-user.target

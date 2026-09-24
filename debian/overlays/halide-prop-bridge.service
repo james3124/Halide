@@ -1,0 +1,22 @@
+[Unit]
+Description=HALIDE prop->dbus bridge (single consent source, allowlist)
+PartOf=halide-android.service
+After=halide-android.service
+# ch.00 §C registry name; ch.05 §25 cgroup row: prop-bridge class
+Slice=halide.slice
+
+[Service]
+Type=simple
+User=halide-bridges
+ExecStart=/usr/sbin/halide-prop-bridge --socket /run/halide/prop.sock \
+  --allowlist /etc/halide/prop-allowlist.txt
+Restart=on-failure
+RestartSec=2s
+CPUWeight=200
+MemoryHigh=80M
+MemoryMax=120M
+TasksMax=40
+OOMScoreAdjust=0
+
+[Install]
+WantedBy=halide.slice

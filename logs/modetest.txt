@@ -1,0 +1,17 @@
+// SAMPLE evidence for gate record 1-2-20260814-REF-A — Phase-1 exit bar
+// REDACTED: `modetest -c` connector/mode excerpt on REF-A (HALIDE-A1), serial stripped.
+// Build: halide-20260814-a3f9c1e2b4d6
+Encoders:
+id	encoder_id	type	crtcs	possible_crtcs	possible_clones
+31	0	DSI	0x00000001	0x00000001	0x00000000
+
+Connectors:
+id	encoder_id	status	name	size (mm)	modes	encoders
+35	31	connected	DSI-1	68x121	1	31
+  modes:
+	index name refresh (Hz) hdisp hss hse htot vdisp vss vse vtot
+  #0 1080x2340 60.00 1080 1116 1160 1240 2340 2344 2348 2370 149472 flags: nhsync, nvsync; type: preferred, driver
+  props:
+	1 source: values...
+	2 CRTC_ID: object id = 30
+// Expected: DSI-1 connected, 1080x2340@60 preferred (panel.json measured variant-A)

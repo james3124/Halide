@@ -1,0 +1,10 @@
+# binderfs-mount-options.syz — syzkaller description for binderfs mount-option parsing fuzz (ch.03 §23).
+# Nightly 30-min syzkaller run on VIRT-arm64 with our fragment; corpus in repo;
+# crashers auto-filed with syzbot-style reproducers. Finding in carried code:
+# fix-or-revert within the 30-day clock (ch.08 §15 bins).
+# Resource: binderfs filesystem mount with fuzzed options (context=, stats=, max=).
+# Owner: halide-kernel. Status: description stub — builder expands syscalls against
+# the pinned LTS headers; phone runs text-only presence check.
+resource fd_binderfs[fd]
+syz_mount_binderfs(opts: ptr[in, array[string]]) fd_binderfs
+binder_ioctl$BINDER_SET_CONTEXT_MGR(fd fd_binderfs, cmd const[BINDER_SET_CONTEXT_MGR], arg ptr[in, int32])

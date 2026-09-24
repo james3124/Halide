@@ -1,0 +1,12 @@
+# debian/lxc-checkconfig.expected -- lxc-checkconfig golden for HALIDE kernels.
+# Checked by debian/scripts/halide-lxc-check: every MUST line must read "enabled".
+# SHOULD lines (debugfs/tracefs) must read "missing/disabled" -- the container
+# profile denies them (ch.05 section 30), so a kernel enabling them regresses
+# confinement and fails the check.
+MUSTNamespaces: uts ipc pid user net enabled
+MUSTCgroup2: memory pids cpuset enabled
+MUSTApparmor: lxc-android enforce enabled
+MUSTSeccomp: SCMP_ACT_TRAP enabled
+MUSTBinderfs: /dev/binderfs enabled
+MUSTVeth: veth pair enabled
+SHOULDMISSING: debugfs tracefs configfs disabled

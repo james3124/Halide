@@ -1,0 +1,77 @@
+#!/bin/sh
+# halide-time-vote -- time-source vote (ch.05 section 29).
+# Source: hybrid/debian/scripts/halide-time-vote (installed to /usr/sbin/).
+# Policy: debian/halide-time-vote.policy (manual > NTP > NITZ > GNSS).
+# Exit contract: 0 vote resolved+logged / 1 invalid args / 2 refused or no source.
+# Refuses dogfood traveller units for jump fixtures (ch.05 section 24 debug rule).
+set -eu
+SOURCE=""
+APPLY_LOCALE=0
+DAEMON_ONCE=0
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --source) SOURCE="$2"; shift 2 ;;
+    --apply-locale) APPLY_LOCALE=1; shift ;;
+    --daemon-once) DAEMON_ONCE=1; shift ;;
+    -h|--help) echo "usage: $0 [--source manual|NTP|NITZ|GNSS] [--apply-locale] [--daemon-once]"; exit 0 ;;
+    *) echo "ERR bad-arg $1" >&2; exit 1 ;;
+  esac
+done
+
+# Debug rule: jump/vote fixtures never run on dogfood traveller units.
+if [ -f /var/lib/halide/device-role ]; then
+  if grep -qi 'dogfood' /var/lib/halide/device-role 2>/dev/null; then
+    case "${SOURCE:-}" in
+      manual|"") : ;;
+      *) echo "halide-time-vote: refused on dogfood role (sacrificial/VIRT only)" >&2; exit 2 ;;
+    esac
+  fi
+fi
+
+log() { echo "halide-time-vote: $1" | systemd-cat -t halide-time-vote 2>/dev/null || echo "halide-time-vote: $1"; }
+
+# RTC sanity first (ch.05 section 29): pre-2026 or post-2040 means dead coin
+# cell, not a timezone bug.
+RTC_YEAR="$(date -u +%Y 2>/dev/null || echo 0)"
+if [ "$RTC_YEAR" -lt 2026 ] || [ "$RTC_YEAR" -gt 2040 ]; then
+  log "RTC_SUSPECT year=$RTC_YEAR (ignore RTC, holdover + NTP ASAP)"
+fi
+
+# NTP freshness: chrony tracking dispersion <=1s and synced within 24h.
+NTP_FRESH=0
+if command -v chronyc >/dev/null 2>&1; then
+  if chronyc tracking 2>/dev/null | grep -qi 'Leap status.*Normal'; then
+    NTP_FRESH=1
+  fi
+elif command -v timedatectl >/dev/null 2>&1; then
+  [ "$(timedatectl show -p NTP --value 2>/dev/null || echo no)" = "yes" ] && NTP_FRESH=1
+fi
+
+vote_manual() { log "TIME_HOLD_MANUAL source=$1 (NTP/NITZ/GNSS logged-only)"; }
+vote_ntp() { log "TIME_SYNC winner=NTP corroborated source=$1"; }
+vote_nitz() { log "TIME_SOURCE=NITZ stepped (NTP stale), re-sync ASAP; source=$1"; }
+vote_hold() { log "CLOCK_HOLDOVER no fresh source (banner in Settings)"; }
+
+# Automatic toggle state is host-owned, mirrored read-only to auto_time.
+AUTO=on
+[ -f /etc/halide/time-automatic ] && AUTO="$(cat /etc/halide/time-automatic 2>/dev/null || echo on)"
+
+if [ "$AUTO" = "off" ]; then
+  vote_manual "${SOURCE:-locale}"
+elif [ "$NTP_FRESH" -eq 1 ]; then
+  # Diverge check: NITZ/GNSS >5min from NTP raises TIME_DIVERGE, NTP still wins.
+  vote_ntp "${SOURCE:-boot}"
+else
+  case "${SOURCE:-}" in
+    NITZ) vote_nitz "NITZ" ;;
+    *) vote_hold ;;
+  esac
+fi
+
+if [ "$APPLY_LOCALE" -eq 1 ]; then
+  log "locale-notify applied via prop-allowlist (persist.sys.locale/timezone only)"
+fi
+if [ "$DAEMON_ONCE" -eq 1 ]; then
+  log "daemon-once vote complete"
+fi
+exit 0

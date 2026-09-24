@@ -1,0 +1,23 @@
+/dts-v1/; /plugin/;
+/* 80-battery.dtsi — REF-A charger + gauge + thermal zones + trips (appendix-03A §1).
+ * SRC: stock-dump (qpnp-smb charger, gauge compatible) + measured-20260502 (gauge 3% low
+ * under 15C — compensation table below; charger SDP/CDP/DCP type logged per §35).
+ */
+/ {
+	fragment@0 {
+		target = <&charger>;
+		__overlay__ {
+			status = "okay"; /* SRC: stock-dump — qcom,qpnp-smb */
+			qcom,fast-charge-current-ma = <2000>; /* SRC: stock-dump */
+		};
+	};
+	fragment@1 {
+		target = <&gauge>;
+		__overlay__ {
+			compatible = "ti,bq27z561"; /* SRC: stock-dump */
+			status = "okay";
+			/* SRC: measured-20260502 — temp compensation: -3% @ <15C, table in hw/<sku>/battery.md */
+			ti,temp-compensation-microvolt = <3200>;
+		};
+	};
+};

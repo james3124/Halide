@@ -1,0 +1,15 @@
+dod_id,area,gate,suite,script,gating(Y/N),evidence_path,owner
+DoD-standby,power,"standby drain within 2x stock (ch.02 §6, ch.10 §3)",power-nightly,tests/suspend-stress.sh (ch.03 §17 extended) + tests/shutdown-drain.sh,Y,power/<sku>/results.md,QA
+DoD-boot,boot,"boot ≤45s cold (ch.10 §4)",boot-timing,tests/boot-timing.sh,Y,logs/boot-timing-*.csv,Release
+DoD-jank,graphics,"scroll jank <5% missed vsync (ch.10 §4/§23)",jank-measure,tests/jank-measure.sh,Y,logs/jank-*.csv,Graphics
+DoD-radio,telephony,"attach ≤90s, setup/drop gates, stall ≤2/device-week (ch.07 §20/§22)",radio-loop,tests/call-loop.sh + tests/sms-loop.sh + tests/data-soak.sh,Y,carrier/<id>/blessing-<date>.md,Telephony
+DoD-OTA,build,"A/B with health gates, rollback-on-bad demonstrated (ch.10 §7)",ota-rollback,tests/ota-rollback-test.sh,Y,release/rollout-<ver>.md,Release
+DoD-signing,security,"testkey-never-ships (ch.09 §3)",testkey-grep,scripts/license-check.sh,Y,security/avb-policy.txt + MANIFEST.lock keys-id,Security
+DoD-repro,build,"two-builder hash match (ch.09 §2)",repro-build,ci/jobs-mr.sh (two-builder release job),Y,MANIFEST.lock builder-digest,Release
+DoD-dogfood,qa,"7-day 10-tester fleet, P0/P1 taxonomy (ch.10 §5/§10)",dogfood,tests/review-sample.py + tests/soak-alerts.conf,Y,qa/signoff-<ver>.md,QA
+DoD-logs,logs,"redacted-only log pipeline (ch.01 §294, ch.09 §4)",redact-audit,tests/qmi-redact.sh + --redact flag audits on all tests/*.sh,Y,logs/REDACT.rules + logs/,Security
+DoD-thermal,thermal,"skin ≤45°C, ≥70% clocks (ch.10 §28)",thermal-soak,tests/thermal-hints.sh + tests/thermal-spoof.sh,Y,power/<sku>/results.md,QA
+DoD-permissions,security,"one consent source, ≤10s sync (ch.05 §9)",permission-sync,tests/permission-sync.sh,Y,bridges/permission-map.csv,Security
+DoD-network,telephony,"single-stack network, VPN fail-closed (ch.05 §16)",netd-contract,tests/netd-contract.sh + tests/net-firewall.sh + tests/vpn-leak.sh + tests/dns-leak.sh,Y,bridges/SOCKETS.md,Telephony
+DoD-recovery,boot,"minimal recovery: sideload, reset, log export (ch.01 §6 FR-07)",recovery-drill,tests/provision-reset.sh + recovery/factory-reset.sh (exit 2 stub),N,runbook-recovery,Release
+DoD-a11y,graphics,"SR-scripted 3 tasks (ch.01 §14)",a11y-battery,tests/a11y-battery.sh,Y,logs/a11y-battery-*.csv,QA

@@ -1,0 +1,20 @@
+[Unit]
+Description=HALIDE first-boot repart+verity provisioning
+Documentation=file:hybrid-os-plan/05-debian-systemd-dual-init.md
+ConditionFirstBoot=yes
+After=systemd-repart.service
+Before=halide-android.service systemd-growfs@home.service
+Requires=dev-disk-by\x2dpartlabel-HALIDE_SYSTEM.device
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/sbin/halide-provision --repart --verify-hashes --luks-format --expand-userdata
+ExecStartPost=/usr/sbin/halide-provision --write-factory-marker /var/lib/halide/factory-sealed
+StandardOutput=journal+console
+TimeoutSec=300s
+SystemCallFilter=@system-service @mount
+SystemCallErrorNumber=EPERM
+
+[Install]
+WantedBy=sysinit.target

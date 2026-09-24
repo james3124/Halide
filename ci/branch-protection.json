@@ -1,0 +1,10 @@
+{
+  "main": {
+    "required_signatures": 2,
+    "require_ci_pass": true
+  },
+  "develop": {
+    "required_signatures": 1,
+    "require_ci_pass": true
+  }
+}

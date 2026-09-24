@@ -1,0 +1,13 @@
+# device/halide/sepolicy/file_contexts.halide - vendor file labels (S14).
+# Correct fix pattern: hal_camera reading persist -> move calibration to a
+# vendor file_contexts read-only label, not a blanket allow.
+/vendor/etc/camera(/.*)? u:object_r:hal_camera_calib_file:s0
+/vendor/etc/lmkd.conf u:object_r:vendor_configs_file:s0
+/vendor/etc/sensors_config.json u:object_r:vendor_configs_file:s0
+/vendor/lib64/libril-halide.so u:object_r:rild_exec:s0
+/vendor/bin/hw/android\.hardware\.camera\.provider@2\.7-service-halide u:object_r:hal_camera_exec:s0
+/vendor/bin/hw/android\.hardware\.sensors@2\.1-service-multihal u:object_r:hal_sensors_exec:s0
+/vendor/bin/hw/android\.hardware\.gnss@2\.1-service-halide u:object_r:hal_gnss_exec:s0
+# ADB auth keys: host-provisioned, container read-only (S35, neverallow S14.3).
+/data/misc/adb/adb_keys u:object_r:adb_keys_file:s0
+/run/halide(/.*)? u:object_r:halide_bridge_sock:s0

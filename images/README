@@ -1,0 +1,5 @@
+# Images dir (text-only, no binaries here)
+Naming: halide-<device>-<slot>.img (e.g. halide-evt-a.img).
+Built artifacts live outside git; this dir holds docs only.
+Flash tooling ref: factory/FLASH-STEPS.md (plan-only).
+AVB ref: security/avb-policy.txt must match slot; never commit .img/.bin.

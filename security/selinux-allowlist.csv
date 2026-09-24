@@ -1,0 +1,9 @@
+domain,allow,target,class,reason
+halide_ril,radio_device,chr_file,read_write_ioctl,"modem control via cdc-wdm0 (ch.07 S1 host truth)"
+halide_prop,property_socket,sock_file,write,"prop->dbus bridge socket writes (ch.05 bridges)"
+halide_audio,audio_device,chr_file,read_write,"PCM path to codec; gains policy only (ch.04 S8)"
+halide_perm,permission_service,service_manager,find,"permission sync discovery, atomic commit (ch.05 S20)"
+halide_composer,display_device,chr_file,read_write,"DRM/KMS commit path (ch.06 S4)"
+halide_android,binder_device,chr_file,read_write_ioctl,"container binder IPC via /dev/binder (ch.05 S16)"
+halide_android,storage_block,blk_file,read,"container reads super via verity mounts only (ch.08 S14)"
+halide_backup,userdata_dir,dir,search,"backup round-trip export path (ch.10 S12)"

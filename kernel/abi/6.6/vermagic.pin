@@ -1,0 +1,5 @@
+# vermagic.pin — exact vermagic string modules check at load (ch.03 §41 step 3).
+# Builder regenerates per build (out/<sku>/abi-current/vermagic.txt) and CI diffs
+# against this pin; mismatch = modules silently refuse at factory (§24 smoke).
+# Format: <release> SMP preempt mod_unload aarch64 (exact `modinfo -F vermagic` output).
+6.6.30 SMP preempt mod_unload aarch64

@@ -1,0 +1,13 @@
+// SAMPLE evidence for gate record 1-2-20260814-REF-A — Phase-1 exit bar
+// REDACTED: output of `ls -l /dev/binder*` on REF-A (HALIDE-A1), serial stripped.
+// Build: halide-20260814-a3f9c1e2b4d6
+total 0
+crw-rw-rw- 1 root root  10,  61 Sep 14 09:12 /dev/binder
+crw-rw-rw- 1 root root  10, 242 Sep 14 09:12 /dev/hwbinder
+drwxr-xr-x 2 root root       0 Sep 14 09:12 /dev/binderfs
+crw------- 1 root root 247,   0 Sep 14 09:12 /dev/binderfs/binder-control
+drwxr-xr-x 2 root root       0 Sep 14 09:12 /dev/binderfs/locales
+crw-rw-rw- 1 root root 247,   1 Sep 14 09:12 /dev/binderfs/binder
+crw-rw-rw- 1 root root 247,   2 Sep 14 09:12 /dev/binderfs/hwbinder
+crw-rw-rw- 1 root root 247,   3 Sep 14 09:12 /dev/binderfs/vndbinder
+// Expected: binder + binderfs/binder-control present (ch.00 Gate 1-2 attachment list)

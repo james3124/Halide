@@ -1,0 +1,61 @@
+#!/bin/sh
+# halide-memory-pressure -- PSI + cgroup pressure forwarding.
+# Source: hybrid/debian/scripts/halide-memory-pressure (installed to /usr/sbin/,
+# run by halide-psi-monitor.service). Writes /run/halide/memory-pressure for
+# halide-power top (ch.05 sections 21/25: one screen shows RAM/CPU/wakes).
+# Exit contract: 0 forwarded / 1 stale input / 2 PSI unavailable (skip).
+set -eu
+POLL=10
+OUT=/run/halide/memory-pressure
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --poll) POLL="$2"; shift 2 ;;
+    --out) OUT="$2"; shift 2 ;;
+    --once) ONCE=1; shift ;;
+    -h|--help) echo "usage: $0 [--poll SECS] [--out PATH] [--once]"; exit 0 ;;
+    *) echo "ERR bad-arg $1" >&2; exit 1 ;;
+  esac
+done
+ONCE="${ONCE:-0}"
+
+forward_once() {
+  if [ ! -f /proc/pressure/memory ]; then
+    echo "halide-memory-pressure: PSI unavailable (kernel off?)" >&2
+    return 2
+  fi
+  AVG10="$(grep 'some ' /proc/pressure/memory | awk '{print $2}' | cut -d= -f2)"
+  AVG60="$(grep 'some ' /proc/pressure/memory | awk '{print $3}' | cut -d= -f2)"
+  AVG300="$(grep 'some ' /proc/pressure/memory | awk '{print $4}' | cut -d= -f2)"
+  if [ -z "$AVG10" ]; then
+    echo "halide-memory-pressure: PSI unparseable" >&2
+    return 1
+  fi
+  mkdir -p "$(dirname "$OUT")"
+  {
+    echo "psi_memory_some_avg10=$AVG10"
+    echo "psi_memory_some_avg60=$AVG60"
+    echo "psi_memory_some_avg300=$AVG300"
+    for s in halide system app; do
+      F="/sys/fs/cgroup/$s.slice/memory.pressure"
+      if [ -f "$F" ]; then
+        V="$(grep 'some ' "$F" | awk '{print $2}' | cut -d= -f2)"
+        echo "slice_${s}_avg10=${V:-?}"
+      else
+        echo "slice_${s}_avg10=absent"
+      fi
+    done
+    echo "ts=$(date +%s)"
+  } > "$OUT.tmp" && mv "$OUT.tmp" "$OUT"
+  return 0
+}
+
+if [ "$ONCE" -eq 1 ]; then
+  forward_once
+  exit $?
+fi
+while true; do
+  forward_once || true
+  # WHY-NOT-EVENT: PSI has no pollable threshold fd on all kernels; fixed
+  # 10s cadence matches the section 21 budget line (no wake storm).
+  sleep "$POLL"
+done

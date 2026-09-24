@@ -1,0 +1,13 @@
+# board-id-table.csv - REF-A board-ID to DTBO overlay map (ch.03 S40)
+# Bootloader applies EXACTLY ONE overlay selected by board-ID (never probe-all:
+# probe-all costs boot seconds S28 anti-pattern + risks double-apply regulator
+# double-vote). mkdtboimg id/rev MUST match this table; mismatch fails closed,
+# never best-effort-nearest. dtbo-dump.txt entry count == overlay count.
+board_id,rev,sku_variant,overlay_file,dtbo_id,dtbo_rev,panel,touch,ram_gb,notes
+0x01,A,refa-4g,panel-touch-a.dtbo,1,1,variant-A,i2c-0x38-fw-v12,4,primary REF-A 4GB
+0x02,A,refa-6g,panel-touch-a.dtbo,1,1,variant-A,i2c-0x38-fw-v12,6,REF-A 6GB same panel
+0x03,B,refa-4g-b,panel-touch-b.dtbo,2,1,variant-B,i2c-0x38-fw-v12,4,appendix-03A quirk 1 (DSI re-train after 3rd suspend) applies to variant A only
+# Verification: scripts/dtbo-apply-check.sh --board-id <id> per row (apply-check
+# matrix); on-device dmesg shows `applied overlay id=<N>` SINGLE line (two lines
+# = double-apply bug, P1); overlays never touch chosen/bootargs or /memory
+# (lint FAIL per S40).

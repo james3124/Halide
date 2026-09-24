@@ -1,0 +1,3 @@
+persist.sys.locale
+persist.sys.timezone
+sys.boot_completed

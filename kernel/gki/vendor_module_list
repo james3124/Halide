@@ -1,0 +1,24 @@
+# vendor_module_list - REF-A GKI vendor modules shipped in vendor_boot (ch.03 S2/S4)
+# Owner: Kernel/BSP. GKI 2.0 layout: one kernel binary per SoC family + signed
+# GKI modules + DTB + DTBO (S2). Modules version-magic pinned; uname -r
+# identical across slots. depmod + modules.order generated at IMAGE BUILD, not
+# on first boot (deterministic boot time, S4).
+# Format: one kernel object path per line (builder resolves against
+# out/<sku>/modules-staging). Out-of-tree ONLY for: camera CAMSS deltas, audio
+# machine quirks, touch firmware loaders - each with Kbuild + dkms.conf
+# equivalent + UPSTREAMING.md (lore link or TODO with date). Signed with
+# release key (ch.09); dev builds test key with CONFIG_MODULE_SIG_FORCE off.
+# In-tree-where-accepted (display, pinctrl, interconnect) ships NO row here.
+drivers/media/platform/qcom/camss/camss-refa-delta.ko
+# WHY (S4): camera CAMSS deltas; UPSTREAMING.md in vendor_modules - removal on upstream accept.
+sound/soc/qcom/refa-machine-quirk.ko
+# WHY (S4): audio machine quirks; UPSTREAMING.md in vendor_modules.
+drivers/input/touchscreen/touch-refa-fwloader.ko
+# WHY (S4): touch firmware loader (touch_fw.bin v12, hw/refa/input-matrix.conf).
+net/wireless/ath10k/wlan-refa-shim.ko
+# WHY (S4): WCN3990 bring-up shim (btattach cold-boot quirk app-03A S5 quirk 2); removal on upstream.
+drivers/gpu/drm/panel/panel-refa-dsi.ko
+# WHY (S4): panel DSI timings variant A/B (board-id-table.csv selects DTBO; module carries both, DT selects).
+# KMI gate (S41): every symbol these modules consume is allowlisted in
+# kernel/abi/6.6/symbols.txt with owner + SINCE tag; orphan exports fail lint.
+# Provenance (S24): post-sign modules.order + PROVENANCE.txt in release store.

@@ -1,0 +1,9 @@
+{
+  "_comment": "debian/lxc-seccomp.policy - container seccomp-bpf allowlist (ch.05 section 30). Default-deny with SCMP_ACT_TRAP so violations land in audit with the offending nr. Installed to /var/lib/lxc/android/seccomp.policy. Arch tables: aarch64 bpf=319 perf_event_open=241 ptrace=117; x86_64 VIRT bpf=321 perf_event_open=298. libseccomp resolves by arch at load; halide-seccomp-dump --check asserts the denied set identical.",
+  "defaultAction": "SCMP_ACT_TRAP",
+  "architectures": ["SCMP_ARCH_AARCH64", "SCMP_ARCH_X86_64"],
+  "syscalls": [
+    {"names": ["read", "write", "openat", "close", "mmap", "mprotect", "brk", "futex", "epoll_create1", "epoll_ctl", "epoll_pwait", "clone3", "rt_sigreturn", "ioctl"], "action": "SCMP_ACT_ALLOW", "comment": "narrowed subset; binder ioctls limited to the thread-read-write pair"},
+    {"names": ["bpf", "perf_event_open", "ptrace", "init_module", "finit_module", "kexec_load", "open_by_handle_at", "userfaultfd", "mount"], "action": "SCMP_ACT_TRAP", "comment": "denied-hard; kexec/init_module attempts are release-blocker signals (IR path)"}
+  ]
+}

@@ -1,0 +1,26 @@
+[Unit]
+Description=HALIDE permission sync bridge (one prompt, both stacks)
+Documentation=file:hybrid-os-plan/05-debian-systemd-dual-init.md
+PartOf=halide-android.service
+After=halide-android.service
+Slice=halide.slice
+
+[Service]
+Type=simple
+User=halide-bridges
+ExecStart=/usr/sbin/halide-permission-bridge --socket /run/halide/perm.sock --map /etc/halide/permission-map.csv
+Restart=on-failure
+RestartSec=2s
+CPUWeight=200
+MemoryHigh=80M
+MemoryMax=120M
+TasksMax=40
+OOMScoreAdjust=0
+# Two-phase commit (stage both, commit both, rollback on either failure):
+# never half-granted. Revoke propagates both ways <=10s (ch.05 section 9).
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+NoNewPrivileges=yes
+
+[Install]
+WantedBy=halide.slice

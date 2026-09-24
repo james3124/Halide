@@ -1,0 +1,32 @@
+# Kconfig for kernel/tests KUnit suites (ch.03 S23).
+# WHY wired here (S23): every new in-tree driver we carry (touch, panel,
+# gauge, pinctrl-quirks) has a KUnit suite; CI runs them on the SAME .config
+# as the S11 build (no test-config drift).
+
+config HALIDE_KUNIT_PANEL_REFA
+	tristate "Halide REF-A panel KUnit tests"
+	depends on KUNIT
+	help
+	  Probe/fail, suspend/resume balance, and DT-parse tests for the
+	  carried REF-A DSI panel driver (vendor_modules/panel-refa-dsi).
+
+config HALIDE_KUNIT_TOUCH_REFA
+	tristate "Halide REF-A touch KUnit tests"
+	depends on KUNIT
+	help
+	  Probe/fail (missing IRQ -> -EPROBE_DEFER), suspend/resume, and
+	  DT-parse tests for the carried REF-A touch driver.
+
+config HALIDE_KUNIT_GAUGE_REFA
+	tristate "Halide REF-A gauge KUnit tests"
+	depends on KUNIT
+	help
+	  Probe/fail, suspend/resume, and DT-parse tests for the carried
+	  REF-A battery gauge driver (hw/refa/battery.md calibration).
+
+config HALIDE_KUNIT_PINCTRL_REFA
+	tristate "Halide REF-A pinctrl-quirk KUnit tests"
+	depends on KUNIT
+	help
+	  Default/sleep state and DT-parse tests for carried REF-A
+	  pinctrl quirks (20-pinctrl.dtso companion).

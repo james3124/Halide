@@ -1,0 +1,8 @@
+# halide-frame-trace template (ch06 s14) - TEMPLATE, not gate data
+# Capture: halide-frame-trace --duration 30 --surface android.<pkg> --out trace-<date>/
+# (wraps ftrace drm_vblank+fence_signaled + perfetto + gfxinfo, CLOCK_MONOTONIC sync).
+# Workload version: graphics/workload-jank.sh (same every release).
+seq,acquire_us,import_us,commit_us,callback_us,sf_latency_us,delta_ms,missed_bool
+# TODO-measured rows go here. Bars: scroll <5% missed; p95 <=20ms@60Hz; fence p95 <=8ms.
+# Report: halide-frame-report emits missed %, p50/p95, fence/import histograms,
+# top-3 stall causes (fence vs import vs callback-late, auto-classified s25 labels).

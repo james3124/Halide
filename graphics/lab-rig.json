@@ -1,0 +1,19 @@
+{
+  "rig": "graphics lab bench REF-A",
+  "owner": "graphics + QA (ch.02 S13 calibration discipline)",
+  "high_speed_camera": {
+    "fps": 240,
+    "mode": "fixed-exposure fixed-focus, auto-ISO off",
+    "method": "CAM240 (ch.06 S26) — never averaged with SCOPE photodiode rows",
+    "exposure_target": "white ~80% zebra"
+  },
+  "photodiode": {
+    "model": "SCOPE-rig-PD1",
+    "method": "SCOPE — authoritative for PWM measurement (ch.06 S18)"
+  },
+  "rig_calibration_id": "GFX-02-2026Q3",
+  "touch_pad_model": "FT8719 variant-A panel + fixture",
+  "panel_variant": "variant-A",
+  "ambient_max_lux": 10,
+  "notes": "charger unplugged + night-light off for every run (variance is the enemy of p95)"
+}

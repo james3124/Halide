@@ -1,0 +1,7 @@
+# panel-refa-dsi — NT36672 DSI link re-train shim (REF-A variant A panels). 180 lines (TECH-DEBT.md, owner halide-kernel, removal r2).
+# Why out-of-tree: DSI link needs re-train after 3rd suspend (appendix-03A §6 quirk 1);
+# workaround staged here until panel driver fix lands upstream.
+# Removal: r2 (fix tracked BUG-xxx; drop when upstream panel driver handles re-train).
+obj-m += panel_refa_dsi.o
+panel_refa_dsi-objs := dsi_retrain.o
+ccflags-y += -Werror -DPRUNE_FOR_UPSTREAM

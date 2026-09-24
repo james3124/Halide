@@ -1,0 +1,13 @@
+# usb-matrix.csv - REF-A USB role test matrix results (ch.03 S35)
+# Every cell run per release; re-enumerate count and orientation bugs tracked.
+# Orientation-only failures get BUG tag USB-ORIENTATION (route to hardware/SI);
+# both-orientation failures route to driver (S35 fault ladder: PHY clock ->
+# VBUS -> role/extcon -> DT dr_mode typo; dtbs_check + fdtdump diff first).
+host_role,gadget_funcs,cable,orientation,expect,result,date,notes
+device,adb,C-to-C,flip-x2,adb-devices-no-reenumerate-storm-dmesg-<=2,PENDING,seed,seed row
+device,adb+mtp,C-to-C,flip-x2,both-enumerate-MTP-browse-100-files,PENDING,seed,seed row
+device,ptp,C-to-A,na,gphoto2-auto-detect-lists,PENDING,seed,seed row
+device,rndis,C-to-C,na,host-IP-PC-side-firewall-default-deny-logged,PENDING,seed,tether-surface ch.05 VPN unaffected
+host,none-ADB-to-accessory,C-to-A-plus-OTG,na,accessory-enumerates-VBUS-<=500mA-w/o-PD,PENDING,seed,VID/PID logged
+host,DP-alt-mode-query,C-to-C-DP-capable,flip-x2,drm_info-DP-appear-disappear-50x-no-wedge,PENDING,seed,ch.06 S15 precondition cell
+# Verification: all cells green per release; storm count and orientation columns filled, never blank.

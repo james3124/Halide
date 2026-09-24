@@ -1,0 +1,6 @@
+# wlan-refa-shim — WCN3990 bring-up shim (REF-A). 420 lines (TECH-DEBT.md, owner halide-kernel, removal r3).
+# Why out-of-tree: needs rework before upstream (see UPSTREAMING.md in this dir).
+# Removal: r3 (upstream wcn3990 BT SCO btattach quirk landed or NDA blocker documented).
+obj-m += wlan_refa_shim.o
+wlan_refa_shim-objs := shim_main.o shim_fw.o
+ccflags-y += -Werror -DPRUNE_FOR_UPSTREAM

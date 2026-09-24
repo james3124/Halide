@@ -1,0 +1,29 @@
+/dts-v1/; /plugin/;
+/* 70-modem.dtsi — REF-A rproc/mpss + qrtr + rmnet + SIM detect (appendix-03A §1, ch.03 §14).
+ * SRC: stock-dump (rproc compatibles, firmware paths) + measured-20260430 (SIM2 detect
+ * polarity inverted vs stock — photo hw/<sku>/sim-tray.jpg).
+ * Firmware: qcom/sdm845/{adsp,cdsp,mpss}.mbn + SHAs in BLOB-SHA256.txt (appendix-03A §5).
+ */
+/ {
+	fragment@0 {
+		target = <&mpss>;
+		__overlay__ {
+			status = "okay"; /* SRC: stock-dump */
+			firmware-name = "qcom/sdm845/mpss.mbn"; /* SRC: stock-dump */
+		};
+	};
+	fragment@1 {
+		target = <&adsp>;
+		__overlay__ {
+			status = "okay"; /* SRC: stock-dump */
+			firmware-name = "qcom/sdm845/adsp.mbn"; /* SRC: stock-dump */
+		};
+	};
+	fragment@2 {
+		target = <&sim2_detect>;
+		__overlay__ {
+			/* SRC: measured-20260430 — polarity inverted vs stock DT */
+			bias-pull-up;
+		};
+	};
+};

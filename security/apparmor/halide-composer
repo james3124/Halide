@@ -1,0 +1,28 @@
+# halide-composer -- AppArmor profile for the host composer (dri + wayland + input only)
+# Parent: ch.08 S10 (composer profile) + S31 (halide-composer row)
+# Owner: Graphics + Security * Review: quarterly
+# Rule: any net_raw ask files a STRIDE row (S23), not a policy line.
+
+#include <tunables/global>
+
+profile halide-composer flags=(attach_disconnected,mediate_deleted) {
+  #include <abstractions/base>
+
+  /dev/dri/** rw,
+  /run/wayland-0 rw,
+  /run/halide/input/* rw,
+  /usr/lib/halide/composer/** mr,
+  /etc/halide/display-calibration.bin r,
+
+  deny network inet,
+  deny network inet6,
+  deny network raw,
+  deny network packet,
+  deny capability net_admin,
+  deny capability net_raw,
+  deny /dev/block/** w,
+  deny ptrace,
+
+  audit network inet,
+  audit network inet6,
+}

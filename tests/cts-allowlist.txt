@@ -1,0 +1,10 @@
+# cts-allowlist.txt - honest subset (5 of 9 ch.10 S9 modules); full list per release
+CtsOsTestCases # base OS sanity, pass-required
+CtsPermissionTestCases # runtime permission model, pass-required
+CtsKeystoreTestCases # keystore/host trust, pass-required
+VtsHalAudioTargetTest # audio HAL contract, pass-required
+VtsHalCameraProviderTargetTest # camera provider HAL, pass-required
+VtsHalSensorsTargetTest # sensors HAL, pass-required
+VtsHalPowerTargetTest # power HAL contract, pass-required
+VtsHalHealthTargetTest # health HAL battery, pass-required
+VtsHalVibratorTargetTest # vibrator HAL, pass-required

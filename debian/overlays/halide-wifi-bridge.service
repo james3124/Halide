@@ -1,0 +1,24 @@
+[Unit]
+Description=HALIDE Wi-Fi/hotspot/tethering state bridge (host NM single owner)
+After=NetworkManager.service halide-android.service
+Requires=NetworkManager.service
+# ch.05 §23/§29: host NM owns wlan0 (STA + AP); Android TetheringManager state
+# is mirrored read-only (hotspot tile intent -> ALREADY_HANDLED). Captive portal
+# single-owner (§29): NM detection + login, Android banner bridged only.
+Slice=halide.slice
+
+[Service]
+Type=simple
+User=halide-bridges
+ExecStart=/usr/sbin/halide-wifi-bridge --socket /run/halide/wifi.sock \
+  --metered-mirror /run/halide/metered.state
+Restart=on-failure
+RestartSec=3s
+CPUWeight=600
+MemoryHigh=120M
+MemoryMax=200M
+TasksMax=60
+OOMScoreAdjust=-100
+
+[Install]
+WantedBy=halide.slice

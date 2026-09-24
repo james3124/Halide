@@ -1,0 +1,17 @@
+# hardware/halide/thermal/severity-map.csv - thermal severity wiring (S25).
+# sensor -> thresholds C -> Android THROTTLING_* -> host action.
+# Thresholds from ch.02 S6 envelope + panel/battery datasheets; NEVER copied
+# across SKUs (thermal mass differs; copied thresholds throttle wrong or burn).
+# Installed to /vendor/etc/thermal/severity-map.csv (see vendor-etc-mappings).
+# Validation: 15-min concurrent soak (CPU+GPU + 1080p record + LTE iperf) at
+# 25C ambient; pass = no SEVERE before 10 min + orderly throttle (freq steps
+# down, no hard shutdown, user-visible "Cooling down" before frame drops).
+# Ambient + thermal-camera cal ID footnoted per soak (ch.10 S8).
+sensor,light_c,moderate_c,severe_c,shutdown_c,android_severity,host_action
+cpu,65,75,85,95,THROTTLING_LIGHT|MODERATE|SEVERE|SHUTDOWN,boost-deny|boost-deny|freq-step-down|emergency-shutdown
+gpu,65,75,85,95,THROTTLING_LIGHT|MODERATE|SEVERE|SHUTDOWN,boost-deny|boost-deny|freq-step-down|emergency-shutdown
+battery,35,40,45,50,THROTTLING_LIGHT|MODERATE|SEVERE|SHUTDOWN,none|brightness-cap-80|brightness-cap-50+modem-TX-backoff|emergency-shutdown-below-battery-safe-curve
+skin,40,43,46,48,THROTTLING_LIGHT|MODERATE|SEVERE|SHUTDOWN,none|brightness-cap-80|video-record-block-with-user-message|emergency-shutdown
+# Throttle-vs-jank arbitration: soak traces tagged with severity so triage
+# distinguishes physics from driver bugs (fence-wait + SEVERE = expected,
+# fence-wait + NONE = bug). IThermal v1: getTemperatures + callback only.

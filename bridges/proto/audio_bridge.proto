@@ -1,0 +1,37 @@
+syntax = "proto3";
+// halide audio bridge stub — text only, matches bridges/audio_bridge.py verbs
+package halide.audio;
+
+message AudioRouteRequest {
+  string node = 1; // media | call | alarm
+}
+
+message AudioRouteResponse {
+  bool ok = 1;
+  string routed_node = 2; // empty if ducked/denied
+  bool ducked = 3;        // call preempts media (ch.05 §29)
+  string reason = 4;      // error text when ok == false
+}
+
+message StreamState {
+  string node = 1;
+  bool active = 2;
+  int32 volume = 3; // 0-100
+  bool muted = 4;
+}
+
+message VolumeRequest {
+  string node = 1;
+  int32 level = 2; // 0-100
+}
+
+message VolumeResponse {
+  bool ok = 1;
+  string reason = 2;
+}
+
+service AudioBridge {
+  rpc SetRoute(AudioRouteRequest) returns (AudioRouteResponse);
+  rpc GetState(AudioRouteRequest) returns (StreamState);
+  rpc VolumeControl(VolumeRequest) returns (VolumeResponse);
+}

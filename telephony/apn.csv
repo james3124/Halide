@@ -1,0 +1,4 @@
+mcc,mnc,carrier,apn
+001,01,Example,internet
+310,260,Generic-US,generic-internet
+001,02,Generic-EU,generic-eu

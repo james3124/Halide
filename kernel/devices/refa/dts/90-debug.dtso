@@ -1,0 +1,26 @@
+/dts-v1/; /plugin/;
+/* 90-debug.dtsi — ENG-ONLY: kgdboc, extra UART, ramoops carveout (appendix-03A §1).
+ * NEVER release: release builds exclude this overlay (CI boot-lint greps release cmdline
+ * for kgdboc/kgdbwait/nowatchdog/initcall_debug per §37 registry — presence fails build).
+ * Ramoops: 1M at 0x9ff00000, must match cmdline ramoops.* params (§30) + /proc/iomem reserved.
+ */
+/ {
+	fragment@0 {
+		target = <&uart6>;
+		__overlay__ {
+			/* SRC: measured-20260502 — eng bench UART, kgdboc=ttyMSM0,115200 kgdbwait eng-only (§17) */
+			status = "okay";
+		};
+	};
+	reserved-memory {
+		/* SRC: measured-20260502 — DRAM carveout outside memblock + CMA + modem shares (§30) */
+		ramoops@9ff00000 {
+			compatible = "ramoops";
+			reg = <0x0 0x9ff00000 0x0 0x100000>;
+			record-size = <0x20000>;
+			console-size = <0x20000>;
+			ftrace-size = <0x10000>;
+			pmsg-size = <0x10000>;
+		};
+	};
+};

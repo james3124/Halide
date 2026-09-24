@@ -1,0 +1,10 @@
+# HANG-SIGNATURES.txt — graphics hang/jank signatures (ch.03 failures table + ch.06 §14/§25)
+# One signature per line: <ID> :: <pattern> :: log source :: first action
+FENCE-TIMEOUT :: "fence timeout" / "sw sync fence timeout" :: dmesg :: pull frame-join.csv window, route driver/icc (ch.06 §9)
+GPU-SCM :: "gpu fault" / "kgsl hangcheck: gpu stuck" :: dmesg gpu section :: capture registers, file BUG halide-graphics
+MISSED-VBLANK :: commit lands after vblank deadline (>0.5pp scroll) :: halide-frame-report :: vsync-margin sweep ch.06 §25
+TAIL-FENCE :: commit→present fence-heavy tails top-10 :: frame-join.csv :: fence-wait histogram, driver ticket
+TAIL-COMMIT :: event→commit >25ms :: touch-latency.csv :: input-forward socket backlog (ch.06 §7)
+TAIL-CALLBACK :: commit fast, callback late :: frame-join.csv :: compositor overload / prio map check
+TAIL-MISSED :: present on +16.7ms grid :: frame-join.csv :: MISS-MARGIN candidate with trace proof
+SF-JANK :: SurfaceFlinger jank clusters in dumpsys gfxinfo framestats :: logcat -d :: attach fresh 200-tap CSV before merge

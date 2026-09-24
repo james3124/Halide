@@ -1,0 +1,17 @@
+# regulator-baseline.txt - REF-A regulator audit baseline (appendix-03A S3, ch.03 S13)
+# Owner: BSP/Power. scripts/regulator-audit.sh diffs live `regulator_summary`
+# against THIS file; any NEW always-on blocks the Phase-3 power gate.
+# Known trap (S13/app-03A S3): vreg_l14a (panel IO) left always-on hides a
+# missing DSI vote AND costs ~8mA - verify use_count -> 0 on panel-off.
+# Format: rail | min_uV | max_uV | always_on | consumers | sleep_drop_mA | source
+# Audited by scripts/regulator-audit.sh (text rules + live regulator_summary diff on device).
+vreg_l14a | 1800000 | 1800000 | no  | panel-IO DSI | 8.0 | stock-dump 2026-04-30 + measured panel-off use_count=0 2026-05-02
+vreg_s4a  | 800000  | 800000  | yes | apps-rail (stock leaves on; removal blocked on DSI-vote proof) | 0.0 | stock-dump 2026-04-30
+vreg_l12a | 1800000 | 1800000 | no  | touch-IO i2c pullup | 0.6 | stock-dump 2026-04-30
+vreg_l22a | 3100000 | 3100000 | no  | camera-AVDD sensor | 1.2 | stock-dump 2026-04-30
+vreg_lvs1a | 1800000 | 1800000 | no | sensor-hub VDD | 0.3 | stock-dump 2026-04-30
+vreg_s1a  | 860000  | 860000  | yes | cpu-vddmx (collapse via ARC, not rail-off) | 0.0 | stock-dump 2026-04-30 + measured ARC collapse 2026-05-02
+# Audit rule: one state per peripheral default+sleep (pinctrl companion
+# 20-pinctrl.dtso); verify sleep actually lowers current (measure, don't assume).
+# Verification: panel-off use_count(l14a)==0; no always-on added without
+# justification comment + meter receipt; llcc/system-cache stock partitioning kept.

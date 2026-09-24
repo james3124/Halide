@@ -1,0 +1,9 @@
+component,active_mw,suspend_mw,duty_pct
+display-panel,480,0,25
+soc-cluster-gold,720,2,30
+soc-cluster-silver,180,1,40
+modem,850,3,10
+wifi,240,4,15
+audio-codec,35,0.5,5
+gnss,110,0,2
+pmic-overhead,12,8,100

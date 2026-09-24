@@ -1,0 +1,5 @@
+cable_id,date,test,result,notes
+SAMPLE-CBL-101,2026-07-28,continuity,PASS,all 24 lines
+SAMPLE-CBL-101,2026-07-28,cc-line,PASS,both orientations Rp/Rn correct
+SAMPLE-CBL-101,2026-07-28,data-rate,PASS,10x getvar + boot.img transfer no retry lines
+SAMPLE-CBL-102,2026-07-29,pd-profile,FAIL,label claims 100W; meter shows 60W — derated in log with photo

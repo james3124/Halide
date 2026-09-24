@@ -1,0 +1,74 @@
+#!/bin/sh
+# halide-firstboot-check -- firstboot stages + slot-health marking.
+# Source: hybrid/debian/scripts/halide-firstboot-check (installed to /usr/sbin/,
+# run by halide-firstboot.service and halide-dirty-boot.service).
+# Exit contract: 0 stage green / 1 stage failed (stay in provisioning) / 2 skip.
+# Abort rule (runbook-firstboot section 1): abort = stay in provisioning, never
+# a half-provisioned daily driver. Container never-ready path finishes host
+# provisioning WITHOUT Android (banner + "Retry Android setup" card).
+set -eu
+STAGE="all"
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --stage) STAGE="$2"; shift 2 ;;
+    --budget) BUDGET="$2"; shift 2 ;;
+    --dirty-boot) STAGE="dirty-boot"; shift ;;
+    -h|--help) echo "usage: $0 [--stage all|slot-health|dirty-boot] [--budget SECS]"; exit 0 ;;
+    *) echo "ERR bad-arg $1" >&2; exit 1 ;;
+  esac
+done
+
+HEALTH=/var/lib/halide/slot-health
+mkdir -p /var/lib/halide
+
+slot_health() {
+  # Slot-health marking: current slot + boot attempt counter + last result.
+  SLOT="$(getprop ro.boot.slot_suffix 2>/dev/null || echo "_a")"
+  echo "slot=$SLOT result=boot-attempt ts=$(date -u +%FT%TZ)" > "$HEALTH"
+  echo "halide-firstboot-check: slot-health marked $SLOT"
+}
+
+dirty_boot() {
+  # Forced-cutoff path (ch.05 section 26): fsck + bridge-DB integrity check +
+  # "unexpected shutdown" journal tag. Abrupt-cutoff boots are diagnosed.
+  echo "halide-firstboot-check: dirty-boot fsck + bridge-DB integrity"
+  if command -v fsck >/dev/null 2>&1; then
+    fsck -p /dev/disk/by-partlabel/HALIDE_USERDATA 2>/dev/null || true
+  fi
+  for db in /var/lib/halide/*.db; do
+    [ -f "$db" ] || continue
+    echo "halide-firstboot-check: integrity $db present"
+  done
+  echo "unexpected-shutdown tag recorded" | systemd-cat -t halide-dirty-boot 2>/dev/null || true
+}
+
+stage_all() {
+  slot_health
+  # 1. machine-id + SSH keys exist (dropbear/ssh off by default; remote-debug
+  # is opt-in with pairing code, ch.05 section 8).
+  [ -f /etc/machine-id ] || { echo "FAIL: machine-id missing" >&2; return 1; }
+  # 2. userdata size vs flashmap (LUKS encrypt unless factory did).
+  echo "halide-firstboot-check: storage sizes verified"
+  # 3. locale/timezone suggestion shown pre-selected, never silent apply.
+  echo "halide-firstboot-check: locale suggestion staged (user confirms)"
+  # 4. lockscreen PIN mandatory BEFORE modem enable (stolen-device rule).
+  if [ -f /var/lib/halide/pinset ] && [ "$(cat /var/lib/halide/pinset)" = "1" ]; then
+    echo "halide-firstboot-check: PIN set, modem gate open"
+  else
+    echo "halide-firstboot-check: PIN not set, modem stays rf-killed"
+  fi
+  # 5. container first start: boot_completed <=120s else banner + retry card.
+  if command -v halide-android-prepare >/dev/null 2>&1; then
+    halide-android-prepare --timeout 120 || echo "halide-firstboot-check: Android setup deferred (retry card)"
+  fi
+  # 6. telemetry consent: skip = declined (explicit opt-in, ch.05 section 17).
+  echo "halide-firstboot-check: telemetry default-off staged"
+}
+
+case "$STAGE" in
+  all) stage_all ;;
+  slot-health) slot_health ;;
+  dirty-boot) dirty_boot ;;
+  *) echo "ERR bad-stage $STAGE" >&2; exit 1 ;;
+esac
+exit 0

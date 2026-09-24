@@ -1,0 +1,43 @@
+# hybrid ci nightly - ch.09 S11 style
+# stages: mr / nightly / release
+# phone-safe: ascii only, no auto flash on release
+---
+stages:
+  - mr
+  - nightly
+  - release
+
+variables:
+  LOG_DIR: hybrid/logs
+
+smoke:mr:
+  stage: mr
+  script:
+    - sh hybrid/tests/smoke.sh
+    - python3 hybrid/tests/test_bridges.py
+
+budget:nightly:
+  stage: nightly
+  script:
+    - sh hybrid/scripts/budget-check.sh
+
+socket-audit:nightly:
+  stage: nightly
+  script:
+    - sh hybrid/scripts/socket-audit.sh
+
+release:manual:
+  stage: release
+  when: manual
+  allow_failure: false
+  needs:
+    - smoke:mr
+    - budget:nightly
+    - socket-audit:nightly
+  script:
+    - echo "manual release gate: need 2 signs"
+    - echo "verify signatures before any flash"
+    - echo "NEVER auto-flash from CI"
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: manual

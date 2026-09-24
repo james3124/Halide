@@ -1,0 +1,26 @@
+[Unit]
+Description=HALIDE PSI monitor (pressure forwarding to /run/halide/memory-pressure)
+Documentation=file:hybrid-os-plan/05-debian-systemd-dual-init.md
+After=halide-android.service
+Wants=halide-android.service
+Slice=halide.slice
+
+[Service]
+Type=simple
+User=halide-bridges
+ExecStart=/usr/sbin/halide-memory-pressure --poll 10 --out /run/halide/memory-pressure
+Restart=on-failure
+RestartSec=10s
+# BUDGET: 10s poll, event-driven where possible (ch.05 section 21). Telemetry
+# class: never steals frames (Weight 100 per section 25 telemetry row).
+CPUWeight=100
+MemoryHigh=60M
+MemoryMax=100M
+TasksMax=30
+OOMScoreAdjust=200
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+NoNewPrivileges=yes
+
+[Install]
+WantedBy=halide.slice

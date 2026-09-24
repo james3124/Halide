@@ -1,0 +1,30 @@
+# garden-bot.yaml -- release-branch gardening bot config (ch.09 S25).
+# Bot proposes, humans dispose: bot auto-merge of garden actions is banned.
+# Config changes require Release + Arch sign. ASCII only.
+---
+branch: release/vX.Y.Z
+states: [CUT, FROZEN, BAKING, THAWED, LOCKED]
+
+stale_pick_nag_days: [3, 7]
+oversize_lines: 300
+oversize_label: NEEDS-FULL-RUN
+bake_clock_resets_on:
+  - kernel/
+  - boot.img
+  - vbmeta
+  - OTA-verify
+respin_budget: 3
+
+rules:
+  - name: stale-pick-nagger
+    action: ping pick owners at 3/7 days; drop stale >7d candidates with comment
+  - name: oversize-flagger
+    action: picks >300 lines get NEEDS-FULL-RUN (full release-job, not subset)
+  - name: missing-sign-blocker
+    action: no QA sign = no merge; no Arch override for cross-cutting picks
+  - name: clock-watcher
+    action: comment bake-clock resets with invalidated prior bake dates
+  - name: thaw-blocker
+    action: merge-back MR must reference 7-day quiet evidence + dashboard green + sign-off link
+  - name: relock-guard
+    action: re-lock within 1h if a human unlocks the branch, with alert

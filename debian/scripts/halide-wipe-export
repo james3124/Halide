@@ -1,0 +1,45 @@
+#!/bin/sh
+# halide-wipe-export -- factory-reset export + wipe attestation (ch.05 section 12).
+# Source: hybrid/debian/scripts/halide-wipe-export (installed to /usr/sbin/).
+# Two confirmations + typed SKU required; generates the wipe attestation line
+# in the recovery log (enterprise requirement P3). NAND crypto-erase runs in
+# recovery (ch.08 section 21), never from a plain power-off drain.
+# Exit contract: 0 wiped+attested / 1 refused (confirm missing) / 2 dry-run skip.
+set -eu
+CONFIRM_TYPED=""
+DRY_RUN=0
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --confirm-typed) CONFIRM_TYPED="$2"; shift 2 ;;
+    --dry-run) DRY_RUN=1; shift ;;
+    -h|--help) echo "usage: $0 --confirm-typed SKU [--dry-run]"; exit 0 ;;
+    *) echo "ERR bad-arg $1" >&2; exit 1 ;;
+  esac
+done
+
+SKU="$(cat /etc/halide-sku 2>/dev/null || echo UNKNOWN)"
+if [ -z "$CONFIRM_TYPED" ]; then
+  echo "halide-wipe-export: refused (two confirmations + typed SKU required)" >&2
+  exit 1
+fi
+if [ "$CONFIRM_TYPED" != "$SKU" ]; then
+  echo "halide-wipe-export: refused (typed '$CONFIRM_TYPED' != SKU '$SKU')" >&2
+  exit 1
+fi
+if [ "$DRY_RUN" -eq 1 ]; then
+  echo "halide-wipe-export: dry-run confirms gate OK for SKU $SKU"
+  exit 2
+fi
+
+# Final export before erase (best effort; erase proceeds regardless after the
+# two confirms -- the confirms ARE the data-loss acknowledgement).
+if command -v halide-backup >/dev/null 2>&1; then
+  halide-backup --export full --out /var/lib/halide/backup/pre-wipe 2>/dev/null || true
+fi
+
+# The erase itself runs in recovery; this tool records the attestation line
+# the recovery image verifies (WIPE_ATTESTATION <sku> <boot-id>).
+BOOTID="$(cat /proc/sys/kernel/random/boot_id 2>/dev/null || echo unknown)"
+echo "WIPE_ATTESTATION sku=$SKU boot=$BOOTID ts=$(date -u +%FT%TZ)" | tee /var/lib/halide/wipe-attestation.log
+echo "halide-wipe-export: attested, handing off to recovery erase"
+exit 0

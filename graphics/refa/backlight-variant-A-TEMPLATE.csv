@@ -1,0 +1,12 @@
+# backlight raw CSV template (display-calibration-procedure s6)
+# File: graphics/<sku>/backlight-<variant>-<date>.csv (one per variant per run)
+# Jig factor from graphics/lab-rig.json; warmup 10min; drift >5% restarts run.
+host_level,android_level,lux1,lux2,lux3,nits,ambient_lux,temp_c
+0,0,TODO,TODO,TODO,TODO,TODO,TODO
+1,1,TODO,TODO,TODO,TODO,TODO,TODO
+13,13,TODO,TODO,TODO,TODO,TODO,TODO
+64,64,TODO,TODO,TODO,TODO,TODO,TODO
+128,128,TODO,TODO,TODO,TODO,TODO,TODO
+192,192,TODO,TODO,TODO,TODO,TODO,TODO
+255,255,TODO,TODO,TODO,TODO,TODO,TODO
+# Status: UNMEASURED. Meter model+serial+date+operator go in panel.json backlight block.

@@ -1,0 +1,31 @@
+[Unit]
+Description=HALIDE PipeWire<->AudioFlinger bridge
+Documentation=file:hybrid-os-plan/05-debian-systemd-dual-init.md
+After=pipewire.service wireplumber.service halide-android.service
+BindsTo=halide-android.service
+Requires=dev-snd-controlC0.device
+Slice=halide.slice
+
+[Service]
+Type=notify
+NotifyAccess=main
+User=halide-audio
+SupplementaryGroups=halide-bridges audio
+ExecStart=/usr/sbin/halide-audio-daemon --quantum 256 --rate 48000 --role-map /etc/halide/audio-roles.conf
+Restart=on-failure
+RestartSec=2s
+Nice=-10
+LimitRTPRIO=0
+CPUWeight=700
+MemoryHigh=150M
+MemoryMax=250M
+TasksMax=60
+OOMScoreAdjust=-100
+# Container has no /dev/snd node (absence is the contract test); the daemon is
+# the single PipeWire client owning alsa_output/alsa_input (ch.05 section 9).
+SystemCallFilter=@system-service @audio
+SystemCallErrorNumber=EPERM
+NoNewPrivileges=yes
+
+[Install]
+WantedBy=halide.slice

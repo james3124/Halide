@@ -1,0 +1,21 @@
+# device/halide/refa/boot-progress-contract.txt - boot_progress event contract.
+# Source: logcat -b events boot_progress_* (ch.03 S27 budget table, ch.04 S5
+# container packaging). halide-boot-timeline merges dmesg + journal + these
+# events into one CSV (stage,ts_ms,source). tests/boot-timing.sh parses the
+# same slice into firmware/ABL/kernel/systemd/container/app-ready columns.
+# Budgets: container-to-boot_completed <=60s Phase-3 (S27); dev-loop expects
+# host login <=30s then boot_completed=1 within 120s (ch.04 S6).
+# Regression rule: any MR adding >500ms to any stage median (5-boot median,
+# sacrificial REF-A, same cable/charger/ambient) carries timeline CSV +
+# justification or CI boot-budget-check fails the MR.
+stage,event,max_ms_from_container_start,notes
+container-init,boot_progress_start,2000,/init entered, ueventd cold-boot done
+system-run,boot_progress_system_run,8000,system_server forked
+pms-scan,boot_progress_pms_system_scan_end,25000,package scan complete
+pms-ready,boot_progress_pms_ready,30000,PMS ready
+ams-ready,boot_progress_ams_ready,40000,AMS ready, boot ani exit near
+screen-on,boot_progress_enable_screen,45000,interactive
+boot-completed,sys.boot_completed=1,60000,Phase-3 gate; dev-loop poll budget 120000
+# Missing-service stalls triage via ch.04 S7 table before kernel blame:
+# FATAL/avc/ServiceManager gaps in logcat -b all point at SELinux denial
+# (audit2allow w/ bug ID) or missing HAL service in manifest.xml (S19).

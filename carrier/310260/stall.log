@@ -1,0 +1,5 @@
+# stall.log -- 310260 data-stall recovery log (ch.07 S20)
+# Rows: timestamp, cell, signal, class, action, healed-Y/N. Redacted (no content, no IMSI).
+# Rows below are FORMAT EXAMPLES with placeholder values, not measurements.
+# timestamp,cell,signal_dbm,class,action,healed
+# TODO-EXAMPLE,TODO-cell,TODO-dBm,STALL-BEARER,RECOVERED-BEARER,TODO

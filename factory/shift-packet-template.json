@@ -1,0 +1,13 @@
+{
+  "shift": "YYYY-MM-DD-day|night",
+  "station": "station-id",
+  "station_image_sha": "TODO-sha256-of-station-image",
+  "usbguard_policy_sha": "TODO-sha256-of-factory-usbguard-rules.conf",
+  "transparency_commit": "TODO-transparency-commit-id",
+  "units_flashed": 0,
+  "egress_probe": "PASS",
+  "nft_diff_hash": "TODO-sha256-of-nft-list-ruleset",
+  "backup_disk_shas": ["TODO-sha256-backup-disk-1"],
+  "anomalies": "none",
+  "countersign": "line-lead-initials-within-24h"
+}

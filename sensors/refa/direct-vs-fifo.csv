@@ -1,0 +1,10 @@
+sensor,handle,fifo_depth,max_batch_s,direct_allowed,direct_rates_hz,fifo_rates_hz,wake_class,shm_kb,threat_note
+accel,TODO,512,10,TODO,TODO,TODO,non-wake,TODO,TODO
+gyro,TODO,256,5,TODO,TODO,TODO,non-wake,TODO,TODO
+mag,TODO,128,10,TODO,TODO,TODO,non-wake,TODO,TODO
+als,TODO,TODO,TODO,TODO,TODO,TODO,non-wake,TODO,TODO
+prox,TODO,none,0(host_poll),TODO,TODO,TODO,wake-0.05mA,TODO,TODO
+step,TODO,64,30,TODO,1,TODO,wake-0.02mA,TODO,TODO
+# Normative columns per ch04 direct-channel table. Handles match sensors_config.json;
+# maxDelayUs/fifoReservedEventCount match measured inventory rows (measured:false amber
+# if config claims without measurement). Status: handles + shm UNMEASURED.

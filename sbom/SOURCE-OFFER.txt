@@ -1,0 +1,17 @@
+HALIDE GPL SOURCE OFFER (ch.09 S11, sbom-license-template S4)
+=====================================================
+This product contains GPL-licensed software (Linux kernel and
+associated components). You may obtain the complete corresponding
+source code -- exact kernel SHA + defconfig + overlay set + toolchain
+versions + build command -- for three years from the date of last
+shipment of this release, by writing to:
+
+  HALIDE Source Compliance <source-offer@example.com>
+
+Include the release tag (halide-vX.Y.Z+<sku>) and the MANIFEST.lock
+SHA from Settings -> About -> Legal. Fulfilment SLA: same day for
+the tarball link, 7 days for physical media where offered.
+
+The exact rebuild packet (build-all.sh works from the packet alone)
+is published alongside every release image. Annual drill rebuilds a
+6-month-old release from packet only; drill failure = P1 process bug.

@@ -1,0 +1,24 @@
+{
+  "carrier": "T-Mobile US (lab SIM, do-not-ship-as-tested)",
+  "mcc_mnc": "310260",
+  "apn": "fast.t-mobile.com",
+  "apn_auth": "none",
+  "mvno_type": "gid",
+  "ims_apn": "ims",
+  "mmsc": "http://mmsc.msg.t-mobile.com/mms/wapenc",
+  "mms_proxy": "none",
+  "voice": "UNTESTED",
+  "volte": "UNTESTED",
+  "emergency": "UNTESTED",
+  "sim_pin_required": false,
+  "data_perf_mbps_med_down": 0.0,
+  "data_perf_mbps_med_up": 0.0,
+  "consent": {
+    "user_apn_override_allowed": true,
+    "override_property": "persist.halide.apn_override",
+    "override_note": "user APN string never clobbered by profile updates (ch.00 registry, ch.07 S3)",
+    "carrier_settings_chip": "carrier settings customized shown when overlay active",
+    "diagnostics_upload": "opt-in only (ch.05 S12 consent rule)"
+  },
+  "notes": "Schema v1 mirror of hybrid-os-plan/carrier-profile-example.md; controlled vocabulary only — scripts/carrier-lint.sh rejects free-text claims. Perf fields stay 0.0 until lab runs with method footnotes."
+}

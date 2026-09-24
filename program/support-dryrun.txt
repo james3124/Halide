@@ -1,0 +1,14 @@
+// SAMPLE support script dry-run output — gate 3-release attachment (ch.00 attachment list)
+// Marked SAMPLE: role-played run on VIRT with a tester as confused-user; NOT a real user session.
+// Build: halide-20260814-a3f9c1e2b4d6 · redaction verified (planted fake IMEI stripped, real one never present)
+$ halide-log-collect --redact --sku REF-A
+[collect] versions: /etc/halide-release=1.4.2 build.prop ro.build.halide=halide-20260814-a3f9c1e2b4d6
+[collect] dmesg tail: 200 lines · journalctl -b errors: 60 lines · logcat crash slice: 40 lines
+[collect] avb state: GREEN (locked) · slot: A active, tries-remaining=7
+[collect] last OTA report: none
+[redact]  IMEI/IMSI/ICCID: stripped (4 hits) · phone numbers: hashed · MAC/BSSID: OUI-masked
+[out]     halide-logs-REF-A-1.4.2-20260814T1015Z.tar.gz (1.2 MiB)
+[out]     SHA256: 0000000000000000000000000000000000000000000000000000000000000000 (SAMPLE)
+script steps: 1 read SHA code ok · 2 UNTESTED-emergency check n/a · 3 restart-vs-app ok
+close read-back: version stated, fix path stated, no "soon" used — PASS
+verdict: DRYRUN-PASS (non-engineer supporter completed script; wording deviations: none)

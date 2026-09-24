@@ -1,0 +1,8 @@
+# avb-policy.txt — vbmeta chain note (phone-safe text only)
+slots: a/b (A/B seamless update, rollback-index bump on builder)
+verity: strict (dm-verity enforced on system/vendor)
+keys:
+  dev: testkey (local eng builds only, never ship)
+  prod: ceremony-signed (offline HSM, fingerprint in MANIFEST.lock keys-id)
+forbidden: verify=off / --disable-verity outside eng (breaks OTA + attestation)
+builder: signs vbmeta + super/host images; phone never signs here

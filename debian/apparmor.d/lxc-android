@@ -1,0 +1,63 @@
+# debian/apparmor.d/lxc-android -- container confinement profile (ch.05 section 30).
+# Installed to /etc/apparmor.d/lxc-android by debian/hooks/20-units.sh.
+# CI asserts byte-identity (apparmor_parser --dump diff) so hand-edits fail
+# boundary-check. No recursive read-write wildcards anywhere in this file.
+profile lxc-android flags=(attach_disconnected,mediate_deleted) {
+  # pivot-root policy: new root is the container rootfs, old root unmounted.
+  pivot_root oldroot=/mnt/oldroot/,
+  deny remount /mnt/oldroot/**,
+  deny mount -> /mnt/oldroot/**,
+  umount /mnt/oldroot/,
+
+  # per-mount allowlist (matches android.conf.in + ch.04 device allowlist).
+  mount fstype=binderfs -> /dev/binderfs/,
+  mount fstype=tmpfs -> /dev/**,
+  mount options=(ro,bind) /vendor/ -> /vendor/,
+  mount options=(ro,bind) /system/ -> /system/,
+  deny mount fstype=debugfs,
+  deny mount fstype=tracefs -> /**,
+  deny mount fstype=configfs -> /**,
+  deny mount -> /home/**,
+  deny mount -> /data/host/**,
+  deny remount /sys/** w,
+
+  # devices: binder + dri + qrtr proxied; never snd/mmcblk/EFS.
+  # Binder nodes enumerated individually (no recursive glob: wildcard
+  # proposals are auto-rejected by scripts/profile-lint.sh, ch.05 sec 30).
+  /dev/binderfs/binder rw,
+  /dev/binderfs/hwbinder rw,
+  /dev/binderfs/vndbinder rw,
+  /dev/dri/card0 r,
+  /dev/dri/renderD128 rw,
+  /dev/qrtr-ns w,
+  deny /dev/snd/* rwklx,
+  deny /dev/mmcblk* rwklx,
+  deny /dev/block/bootdevice/by-name/persist* rwklx,
+  deny /dev/block/bootdevice/by-name/modemst* rwklx,
+
+  # bridge sockets only (bridges/SOCKETS.md registry paths).
+  /run/halide/prop.sock rw,
+  /run/halide/ril.sock rw,
+  /run/halide/audio.sock rw,
+  /run/halide/perm.sock rw,
+  /run/halide/composer.sock rw,
+  /run/halide/netd.sock rw,
+  /run/halide/input.sock rw,
+  /run/halide/wifi.sock rw,
+  /run/halide/bt.sock rw,
+  deny network raw,
+  deny network packet,
+  deny capability sys_rawio,
+  deny capability sys_module,
+  deny capability sys_admin,
+  capability net_bind_service,
+  capability setgid, setuid,
+
+  # ptrace/perf: container cannot inspect host or sibling.
+  deny ptrace peer=unconfined,
+  deny signal peer=unconfined,
+  deny /proc/sys/** w,
+  # debugfs is denied at mount above; this flat deny is the second net on the
+  # top level (kept single-level so the no-recursive-allow lint stays green).
+  deny /sys/kernel/debug/* rwklx,
+}

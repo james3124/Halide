@@ -1,0 +1,20 @@
+# smmu-masters.csv - REF-A DMA master to SMMU context-bank map (ch.03 S39)
+# NORMATIVE per-SKU companion to the S39 master table. Every DMA master has a
+# DT iommus fwspec with provenance (S13); every CB has owner + domain type.
+# Unmapped-master DMA that happens to work (1:1 PA==IOVA luck) is a P0.
+# IDENTITY allowed only for the display linear-FB carveout with Security sign
+# + expiry release named. iommu.passthrough=1 anywhere outside eng-debug fails
+# release boot-lint (S39). Audit: scripts/smmu-audit.py -> AUDIT PASS expected.
+master,stream_ids,cb,domain,owner,page_config,notes
+MDSS-display,0x1800-0x18FF,cb-display,DMA+IDENTITY-carveout,Display/Kernel,4K+64K linear-FB carveout,IDENTITY carveout Security-signed expiry TBD-release; underrun-path faults blank screen (triple-stress 0 faults + modetest)
+CAMSS-IFE0,0x2000-0x20FF,cb-cam0,DMA,Camera/Kernel,4K+64K prefetch-on,stride-mismatch faults green-frame (ch.04 S9); 12MP burst 0 faults
+CAMSS-IFE1,0x2100-0x21FF,cb-cam1,DMA,Camera/Kernel,4K+64K prefetch-on,see IFE0
+CAMSS-IFE2,0x2200-0x22FF,cb-cam2,DMA,Camera/Kernel,4K+64K prefetch-on,see IFE0
+Adreno-GMU,0x1000-0x17FF,cb-gpu,DMA-per-context-TTBR,Graphics/Kernel,per-process pagetables,GPU fault wedges composer (ch.06 S14 fence-wait vs fault-wait); deqp 0 faults
+USB-DWC3,0x2C00-0x2C1F,cb-usb,DMA-coherent,BSP/Kernel,coherent,MTP bulk faults corrupt silently; 10GB MTP round-trip sha256 + 0 faults
+PCIe-WiFi,0x3000-0x301F,cb-pcie,DMA-MSI-mapped,Net/Kernel,MSI-mapped,fault drops rx rings under iperf; iperf 60s + 0 faults
+LPASS-audioDSP,0x2800-0x28FF,cb-lpass,DMA-4K-only,Audio/Kernel,4K-only DSP-TLB-erratum,wrong pagesize = silent underrun gaps (not faults); offload gap counter
+# Fault triage (S39): cb -> master via THIS file; IOVA near 0 = unmapped-buffer
+# DMA; Translation-under-concurrency = IOVA exhaustion/CMA pressure; Permission
+# = wrong dma_data_direction. Tag SMMU-FAULT; IDENTITY-adjacent faults go to
+# Security same-day. Verification: smmu-probe groups + audit PASS + triple-stress 0 faults.

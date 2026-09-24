@@ -1,0 +1,3 @@
+freq_mhz,cable_id,loss_db
+1575.42,GNSS-L1-STUB,1.2
+850.00,CELL-LB-STUB,0.8

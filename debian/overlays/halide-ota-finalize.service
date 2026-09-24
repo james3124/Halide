@@ -1,0 +1,22 @@
+[Unit]
+Description=HALIDE A/B OTA finalize (mark-boot-successful after health gates)
+After=halide-android.service ModemManager.service
+Requires=halide-android.service
+# ch.00 §C registry name; ch.09 §4: health gate = systemd up + sys.boot_completed=1
+# + MM registered + SMS loopback <=5min, THEN bootctl mark-boot-successful.
+# Any gate miss -> auto-rollback + halide-ota-report (redacted).
+Slice=halide.slice
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/sbin/halide-ota-finalize --timeout 300
+# Transient bulk class per ch.05 §25 table (backup/ota-* row)
+CPUWeight=300
+IOWeight=200
+MemoryHigh=300M
+MemoryMax=500M
+TasksMax=100
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,19 @@
+{
+  "_comment": "vendor/halide/refa/sensors_config.json - multihal handle map (S21 runbook companion, S38). Installed to /vendor/etc/sensors_config.json. Every handle's maxDelayUs/fifoReservedEventCount match measured rows in sensors/<sku>/inventory.md + power.md (S32); config claims without measurement carry measured:false (amber) and refuse direct-report even on YES rows.",
+  "multihal": "android.hardware.sensors@2.1-multihal",
+  "handles": [
+    {"handle": 1, "sensor": "accel", "wake": false, "fifoReservedEventCount": 1024, "maxDelayUs": 6000000, "direct": "RATE_LEVELS(50,100,200Hz)", "shm_kb": 64, "measured": true},
+    {"handle": 2, "sensor": "gyro", "wake": false, "fifoReservedEventCount": 1024, "maxDelayUs": 6000000, "direct": "RATE_LEVELS(50,100,200Hz)", "shm_kb": 64, "measured": true},
+    {"handle": 3, "sensor": "mag", "wake": false, "fifoReservedEventCount": 256, "maxDelayUs": 10000000, "direct": "UNSUPPORTED", "measured": true},
+    {"handle": 5, "sensor": "step-counter", "wake": true, "fifoReservedEventCount": 0, "maxDelayUs": 0, "direct": "UNSUPPORTED", "power_note": "wake accel for step-detect; see sensors power.md", "measured": true},
+    {"handle": 6, "sensor": "als", "wake": false, "fifoReservedEventCount": 0, "maxDelayUs": 0, "direct": "UNSUPPORTED", "measured": false},
+    {"handle": 7, "sensor": "prox", "wake": true, "fifoReservedEventCount": 0, "maxDelayUs": 0, "direct": "UNSUPPORTED", "power_note": "on-change only; suspend-block audit S14", "measured": false},
+    {"handle": 8, "sensor": "pressure", "wake": false, "fifoReservedEventCount": 64, "maxDelayUs": 30000000, "direct": "UNSUPPORTED", "measured": true},
+    {"handle": 11, "sensor": "rotation-vector", "wake": false, "fused": "host", "host_batch_hz": 5, "direct": "UNSUPPORTED", "measured": false}
+  ],
+  "invariants": [
+    "direct grows only for accel/gyro at allowlisted rates; any other direct-register counts as P1 + missing threat-note",
+    "wake sensors attributed per handle in wakeup_sources; unnamed sensor wakes = misclassified non-wake, P1",
+    "dropped-batch stays 0 at max-batch (shake-table 100Hz 60s); drops mean watermark IRQ late"
+  ]
+}

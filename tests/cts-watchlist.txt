@@ -1,0 +1,7 @@
+# cts-watchlist.txt - informational-only modules (ch.10 S9 watchlist).
+# Non-blocking: tracked with bug IDs, never gating. Never claim full CTS/VTS.
+# Format: <module> <BUG-id-or-NONE> <reason>
+CtsTelephonyImsTestCases NONE IMS-stack informational (no carrier IMS blessing yet, ch.07)
+CtsDrmTestCases NONE DRM-L1 informational (Widevine L1 out of v1 scope, ch.01 S4)
+CtsBiometricTestCases NONE biometric informational (watchlist per ch.10 S2, biometric-policy)
+CtsNnapiTestCases NONE NNAPI-vendor informational (NPU gated on triple-condition, ch.04 S20)

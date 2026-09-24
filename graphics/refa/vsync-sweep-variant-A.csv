@@ -1,0 +1,12 @@
+# vsync margin sweep per panel variant (ch06 s25) - TEMPLATE
+# Workload: graphics/workload-jank.sh fixed (F-Droid fling x5 + 720p 60s + drawer x10)
+# margin_ms,missed_pct,fence_p95_ms,import_p95_ms,callback_late,corner,note
+1.0,TODO-measured,TODO,TODO,TODO,room,30s per point via halide-frame-trace
+1.5,TODO-measured,TODO,TODO,TODO,room,
+2.0,TODO-measured,TODO,TODO,TODO,room,
+2.5,TODO-measured,TODO,TODO,TODO,room,
+3.0,TODO-measured,TODO,TODO,TODO,room,
+4.0,TODO-measured,TODO,TODO,TODO,room,
+# Repeat knee+-1ms at low-battery <=15% + post-soak hot (THERMAL MODERATE);
+# headroom >=0.5ms over room-temp knee committed. Knee = lowest margin within
+# 0.5pp of 4ms floor value. MISS-FENCE/MISS-IMPORT never fixed by +margin.

@@ -1,0 +1,25 @@
+# halide-hardening.fragment — security self-protection deltas (ch.03 §3, ch.08 §16)
+# Merge order: mainline defconfig <- gki.fragment <- halide-base.fragment <- halide-hardening.fragment <- devices/<sku>/sku.fragment
+# Phone-editable, builder-compiled; every line carries its WHY (ch.08 §16 — defense in depth, all on).
+
+# MAC: SELinux for the Android container namespace (enforcing=1 release cmdline, ch.03 §37)
+CONFIG_SECURITY_SELINUX=y
+# MAC: AppArmor for Debian host services + bridges (host-side profile set, ch.08 §10)
+CONFIG_SECURITY_APPARMOR=y
+# Yama: ptrace-scope restriction — bridges deny ptrace; kernel backstop (ch.08 §10 containment)
+CONFIG_SECURITY_YAMA=y
+
+# Copy-to/from-user bounds check — classic exploit class closed at the boundary
+CONFIG_HARDENED_USERCOPY=y
+# Compiler fortify: catches overflow-prone libc patterns at build + runtime
+CONFIG_FORTIFY_SOURCE=y
+# Stack canaries (strong): ROP/gadget cost raiser, negligible measured overhead
+CONFIG_STACKPROTECTOR_STRONG=y
+# KASLR: randomize kernel base — same-image boots differ in layout
+CONFIG_RANDOMIZE_BASE=y
+
+# Zero freshly allocated pages — infoleak + use-of-uninit mitigation (measure boot cost once per LTS)
+CONFIG_INIT_ON_ALLOC_DEFAULT_ON=y
+# SLUB debug poisoning OFF on release: it costs RAM + CPU on the 4GB tier (ch.05 §25 budget);
+# keep available for eng builds via cmdline, never default-on here.
+CONFIG_SLUB_DEBUG_ON=n

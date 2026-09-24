@@ -1,0 +1,14 @@
+# MANIFEST.lock — super-pin (phone-safe stub, no sync on phone)
+# Full pins live here when built on a real builder. Phone must NOT `repo sync` this.
+# See hybrid-os-plan/09-build-ota-factory-ci.md §1.
+
+kernel: mainline-lts-6.6.x # LTS with >=3y remaining at program start, record EOL date
+kernel-sha: TODO-builder-fills
+aosp: android-14.0.0_rXX # container userland, no GMS
+aosp-manifest: TODO-builder-fills-halide.xml-rev
+debian: bookworm-20260101 # snapshot, reproducible
+mesa: 24.0.x
+builder-digest: TODO-sha256-of-ci-Dockerfile
+keys-id: TODO-pubkey-fingerprint
+
+# Phone rule: do not resolve these here. Copy this file to builder, sync there.

@@ -1,0 +1,19 @@
+# rollout-thresholds.yaml -- OTA staged-rollout autopilot numbers (ch.09 S26).
+# Declarative thresholds per release; autopilot proposes, humans confirm
+# (autopilot never self-promotes past 10 pct without the named 48h-watch humans).
+# All telemetry redacted: versions, gate-times, failure stage; no IMSI.
+rollback_halt_pct: 2.0
+gate_miss_halt_pct: 1.0
+crash_delta_halt_x: 2.0
+verify_fail_halt_pct: 0.5
+slot_write_fail_halt_pct: 0.5
+bake_hours: 48
+amber_extend_hours: 24
+rollback_green_pct: 0.5
+mix_skus_min: 2
+mix_carriers_min: 3
+funnel_complete_pct: 95
+halt_latency_min: 15
+internal_fleet_first_hours: 24
+post100_quiet_days: 7
+halt_decision_clock_hours: 24

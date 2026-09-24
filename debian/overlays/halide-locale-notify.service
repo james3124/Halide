@@ -1,0 +1,20 @@
+[Unit]
+Description=HALIDE locale/timezone change notifier (host writes, bridge carries)
+Documentation=file:hybrid-os-plan/05-debian-systemd-dual-init.md
+After=halide-prop-bridge.service
+Requires=dev-rtc0.device
+Slice=halide.slice
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+# Triggered by halide-locale-notify.path on /etc/locale.conf or
+# /etc/timezone change. Validates against the MCC locale list, then writes
+# via the prop-allowlist only (persist.sys.locale, persist.sys.timezone).
+# Conflict rule host-wins (ch.05 sections 9/27). Runs halide-time-vote so a
+# manual pick marks TIME_HOLD_MANUAL (ch.05 section 29).
+ExecStart=/usr/sbin/halide-time-vote --source manual --apply-locale
+TimeoutSec=30s
+SystemCallFilter=@system-service @clock
+SystemCallErrorNumber=EPERM
+NoNewPrivileges=yes

@@ -1,0 +1,25 @@
+/dts-v1/; /plugin/;
+/* 10-regulators.dtsi — REF-A rpmh regulator rails (appendix-03A §1, ch.03 §13).
+ * SRC: stock-dump 2026-04-30 (regulator_summary from stock boot) + measured idle audit.
+ * Rule: regulator-always-on needs a justification comment on the same line (dtbo-lint).
+ * Trap: vreg_l14a (panel IO) left always-on hides a missing DSI vote AND costs ~8mA —
+ * verify use_count -> 0 on panel-off (scripts/regulator-audit.sh vs hw/<sku>/regulator-baseline.txt).
+ */
+/ {
+	fragment@0 {
+		target = <&apps_rpmh>;
+		__overlay__ {
+			/* SRC: stock-dump — PM6150L pmic, min/max from stock regulator_summary */
+			vreg_l14a: ldo14 {
+				regulator-min-microvolt = <1800000>;
+				regulator-max-microvolt = <1800000>;
+				/* no always-on: panel DSI votes this rail; gated on panel-off (measured 2026-05-02) */
+			};
+			vreg_s4a: smps4 {
+				regulator-min-microvolt = <800000>;
+				regulator-max-microvolt = <800000>;
+				regulator-always-on; /* SRC: stock-dump — apps rail, stock leaves on; removal blocks on DSI-vote proof */
+			};
+		};
+	};
+};

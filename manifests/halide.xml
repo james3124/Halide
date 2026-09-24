@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- manifests/halide.xml — super-level repo manifest (mirrors aosp/.repo/manifests/halide.xml style).
+     Values mirror manifests/MANIFEST.lock: kernel mainline-lts-6.6.x, aosp android-14.0.0_rXX,
+     debian bookworm-20260101, mesa 24.0.x. Revisions are builder-filled placeholders — the phone
+     must NOT run repo sync on this file (README.phone-build.md rule). -->
+<manifest>
+  <remote name="halide" fetch="https://example.com/halide" />
+  <default remote="halide" revision="TODO-builder-fills" sync-j="4" />
+
+  <!-- super pins; revision placeholders consistent with MANIFEST.lock (builder resolves at sync) -->
+  <project name="kernel/mainline-lts" path="kernel" revision="lts-6.6.y-TODO-builder-fills" />
+  <project name="aosp/platform" path="aosp" revision="android-14.0.0_rXX" />
+  <project name="debian/snapshot" path="debian" revision="bookworm-20260101" />
+  <project name="mesa/mesa" path="mesa" revision="24.0.x" />
+  <project name="halide/keys-id" path="keys-id" revision="TODO-pubkey-fingerprint" />
+
+  <!-- TODO: pin revs to tagged releases before first sync (ch.09 §13 digest-pinning) -->
+  <!-- TODO: builder-digest: TODO-sha256-of-ci-Dockerfile (recorded in MANIFEST.lock, not here) -->
+  <!-- text-only stub: do not run repo sync from phone -->
+  <!-- owner: halide-release -->
+  <!-- license: Apache-2.0 -->
+</manifest>

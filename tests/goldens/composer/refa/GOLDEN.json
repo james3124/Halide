@@ -1,0 +1,1 @@
+{"ambient_lux": "TODO-measured", "args": "--drawer-settle", "brightness_nits": 200, "expiry": "TODO-measured (re-validate at 6 months or 2 releases)", "firmware_shas": "TODO-measured", "manifest_lock_sha": "TODO-measured", "png": "drawer.png", "producer": "tests/display/composer-diff.sh", "sku": "refa", "tolerance": {"pixel_pct_max": 2.0}, "unit_label": "TODO-measured"}

@@ -1,0 +1,59 @@
+# neverallow.te -- normative neverallow invariants (sepolicy-deltas S2 + ch.08 S31 table)
+# Location note: device/halide/sepolicy/neverallow.halide is the compile input;
+# THIS file is the Security-owned mirror CI diffs against it (divergence fails).
+# Rule: each neverallow carries the incident-or-reason it guards (S2) -- rules
+# without reasons get deleted in review. CI: checksepolicy -M -c 30.
+# Owner: Security + Arch * Review: per-MR neverallow job + quarterly audit.
+
+# --- container boundary (S31 u:r:container:s0 row; threat-model S4 Elevation) ---
+# REASON: persist/efs rewrite via unlocked tooling (threat-model S1 Tampering)
+neverallow container persist_block:blk_file write;
+neverallow container efs_block:blk_file { write append };
+neverallow container modemst_block:blk_file { write append };
+# REASON: unlock->root persistence + container->host escape (threat-model S4)
+neverallow container halide_bridge_exec:file { entrypoint execute };
+neverallow container self:capability sys_admin;
+neverallow container self:process ptrace;
+neverallow container kernel:system module_request;
+
+# --- bridges (S31 halide-bridge-* rows; RCE containment S10) ---
+# REASON: parser RCE must not gain exec or cross-bridge reach (attack-test E-suite)
+neverallow halide-bridge-* self:process execmem;
+neverallow halide-bridge-* self:process execmod;
+neverallow halide-bridge-* self:process execve;
+neverallow halide-bridge-*:socket * relabelto;
+neverallow halide-bridge-a halide-bridge-b:socket connectto;
+
+# --- radio helper (ch.07 QRTR/QMI; no raw diag widening as shortcut) ---
+# REASON: diag widening bypasses the QRTR audit ladder (ch.07 S15)
+neverallow halide_rild diag_device:chr_file { read write };
+neverallow halide-radio-helper modemst_block:blk_file write;
+neverallow halide-radio-helper self:capability sys_rawio;
+neverallow halide-radio-helper efs_block:blk_file *;
+
+# --- camera (reads calibration read-only; no persist write to "fix" tuning) ---
+neverallow halide_camera persist_file:file write;
+
+# --- binder discipline (use the bridge macros, never raw grants) ---
+# REASON: unconstrained cross-boundary binder = deputy path (threat-model S3/S4)
+neverallow { container halide_rild halide_camera halide_audio } self:binder { call transfer };
+
+# --- composer (S31 row; network asks file STRIDE rows, not policy lines) ---
+neverallow halide-composer self:capability net_admin;
+neverallow halide-composer self:capability net_raw;
+neverallow halide-composer persist_block:blk_file write;
+
+# --- ota sidecar (verifies with pubs; never reads private-key material) ---
+# REASON: OTA never touches signing secrets by construction (ch.08 S8)
+neverallow halide-ota active_slot_block:blk_file write;
+neverallow halide-ota self:process execve;
+neverallow halide-ota keys_file:file read;
+
+# --- recovery (never mounts userdata decrypted without auth; S21 single impl) ---
+# REASON: recovery bypass of lockscreen auth (threat-model S7 Tampering)
+neverallow recovery userdata:file read;
+neverallow recovery self:capability dac_override;
+
+# --- debug domain must not exist on user (ch.09 S18 wrong-variant row) ---
+# REASON: userdebug escape hatch on retail = P0 (variant gate S31-4 enforces)
+neverallow user halide-debug:process *;

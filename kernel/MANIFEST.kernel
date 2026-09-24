@@ -1,0 +1,23 @@
+# MANIFEST.kernel — exact kernel source + toolchain pins (ch.03 §2 pin procedure, §11 build runbook).
+# Builder fills the TODO values; phone must NOT fetch/checkout here (NO-COMPILE mode).
+# Pin procedure (builder, containerized per ci/Dockerfile digest):
+#   cd kernel/linux && git fetch --tags
+#   git checkout v6.6.30 && git rev-parse HEAD | tee ../MANIFEST.kernel
+#   Record: clang --version, gcc --version, rustc --version, container digest.
+# Target: 6.6 LTS (fallback 6.1) + GKI 2.0. Two builders with the same container
+# digest must produce identical Image.gz bytes modulo KBUILD_BUILD_TIMESTAMP
+# (set KBUILD_BUILD_TIMESTAMP from SOURCE_DATE_EPOCH per §11; verify with diffoscope quarterly).
+
+linux-tag: v6.6.30
+linux-sha: TODO-builder-fills-git-rev-parse-HEAD
+gki-common-sha: TODO-builder-fills-android-gki-defconfig-rev
+toolchain-clang: TODO-builder-fills-clang-r498229-or-newer
+toolchain-gcc: TODO-builder-fills
+toolchain-rustc: TODO-builder-fills
+builder-digest: TODO-sha256-of-ci-Dockerfile
+kbuild-timestamp: TODO-SOURCE_DATE_EPOCH-from-git-log-1-format-pct-ct
+fragment-shas:
+  gki/android_gki.fragment: TODO-sha256
+  halide-base.fragment: TODO-sha256
+  halide-hardening.fragment: TODO-sha256
+  devices/refa/sku.fragment: TODO-sha256

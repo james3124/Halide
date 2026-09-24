@@ -1,0 +1,15 @@
+# device/halide/sepolicy/README - sepolicy workflow (ch.04 S14 + S27 SLA).
+# No cowboy allows. Steps:
+# 1. Build userdebug, run full Phase-1/2 scenario set, collect audit.log.
+# 2. audit2allow -p out/.../sepolicy -> proposed rules; each rule gets a
+#    BUG:<id> EXPIRY:<date> WHY:<one line> comment or review rejects it.
+# 3. neverallow baseline = neverallow.halide (container breakout, raw persist
+#    write, direct gauge access from container). MAC pairings = mac-mappings.
+# 4. logs/<sku>-selinux-baseline.txt regenerated per release; diff must be
+#    empty or carry per-line justification linked to a bug (Security signs).
+# SLA: any avc: denied delta vs baseline gets a BUG within 48h and a
+# disposition within 14 days (allow-with-comment, neverallow-justified-refusal
+# with code fix, or reverted behavior). Undispositioned at 14 days escalates
+# to the weekly blocker review (SELINUX-AGE P0s).
+# Per-release check (text): neverallow.halide present, every allow-file rule
+# carries BUG+EXPIRY+WHY, no permissive domain without ENG-ONLY on release.

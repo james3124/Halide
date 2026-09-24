@@ -1,0 +1,30 @@
+# refa sku.fragment — deltas on top of halide-base (+halide-hardening) for REF-A (SDM845).
+# Merge order: mainline defconfig <- gki.fragment <- halide-base.fragment
+#              <- halide-hardening.fragment <- devices/refa/sku.fragment (this file, wins).
+# Provenance rule (ch.03 §13): every line has a WHY; hardware specifics live in
+# dts/*.dtsi overlays with SRC comments, not as invented CONFIG_ symbols.
+# Previous per-SKU invented Kconfig symbols (panel/touch/audio/modem/battery/regulator
+# with a REFA infix) were removed: they do not exist upstream and would fail the builder merge.
+# Panel/touch/audio/modem/battery specifics are DT overlays (dts/30..80) + vendor_modules/
+# shims tracked in TECH-DEBT.md (wlan-refa-shim, panel-refa-dsi).
+
+# Bring-up fallback panel (ch.03 §10: black-screen isolate with simple-panel + fixed
+# regulator before blaming stock timings). Disabled once full panel driver proves out.
+CONFIG_DRM_PANEL_SIMPLE=m
+
+# Touch: FocalTech FTS family (upstream driver; IRQ GPIO + fw name in dts/30-panel-touch.dtsi)
+CONFIG_TOUCHSCREEN_FTS=y
+
+# Audio: WCD934x codec (machine quirks in vendor_modules/ per §4 + dts/40-audio.dtsi topology)
+CONFIG_SND_SOC_WCD934X=y
+
+# Battery gauge: BQ27xxx family (calibration in dts/80-battery.dtsi + hw/<sku>/battery.md)
+CONFIG_BATTERY_BQ27XXX=y
+
+# Ramoops reservation is NOT a Kconfig here: address/size/record come from the
+# DT reserved-memory node (dts/90-debug.dtsi) + cmdline (ramoops.mem_address=...),
+# which must match (ch.03 §30; mismatch fails boot-lint). REF-A value:
+# ramoops.mem_address=0x9ff00000 ramoops.mem_size=0x100000
+# record_size console 0x20000 + dmesg 0x20000 + ftrace 0x10000 + pmsg 0x10000.
+# Modem (mpss/adsp/cdsp rproc + qrtr/rmnet) needs no extra Kconfig beyond base;
+# firmware paths + SHAs live in BLOB-SHA256.txt, state expectations in appendix-03A §5.

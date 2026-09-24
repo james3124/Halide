@@ -1,0 +1,4 @@
+id,date_in,sku,symptom_class,triage_owner,sla_start,verdict,notes
+RMA-S001,2026-08-20,REF-A,no-charge,ken,2026-08-20,OPEN,cable-excluded via golden set; charger sag >5% (CHG-RET-002 destroyed)
+RMA-S002,2026-08-22,REF-A,panel-lines,ken,2026-08-22,WAIT-CONSENT,backup consent pending; device quarantined not wiped
+RMA-S003,2026-08-25,REF-B,modem-dead,ana,2026-08-25,REPAIR,testkey image on arrival — routed to engineering pool per unlock policy

@@ -1,0 +1,16 @@
+digraph keyflow {
+  // security/key-flow.dot -- key flow diagram (ch.08 S9 + S26)
+  // PIN -> KDF -> LUKS -> volume key -> FBE master -> per-app keys.
+  // Single passphrase prompt (two prompts = UX fail, S9). No StrongBox claim v1.
+  rankdir=LR;
+  node [shape=box, fontname="Helvetica"];
+  pin        [label="Lockscreen PIN (>=6)\nrate-limited 10->30s dbl"];
+  kdf        [label="halide-pin-derive\nArgon2id (registry m/t/p)"];
+  luks       [label="LUKS2 volume key\naes-xts-plain64 512-bit"];
+  keyring    [label="LUKS-unlocked keyring\n+ vbstate-at-creation\n+ rollback-index"];
+  fbe_master [label="FBE master key\nAES-256-GCM"];
+  per_app    [label="Per-app file keys"];
+  pin -> kdf -> luks -> keyring -> fbe_master -> per_app;
+  hb [shape=note, label="hb_strongbox_* ->\nATTESTATION_IMPOSSIBLE_V1 (S26)"];
+  keyring -> hb [style=dotted];
+}

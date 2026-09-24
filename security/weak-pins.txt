@@ -1,0 +1,24 @@
+# weak-pins.txt — weak crypto pins banned in tree (ch.08 §11/§32; CI grep enforced)
+# Any reference to the algorithms below in security-relevant code/config fails the build.
+# Legacy compat never inherits (kdf-registry.json prohibited list mirrors this file).
+banned: md5 (key derivation, transport, signatures)
+banned: sha1 (signatures, KDFs; collision-class uses only outside security-relevant paths)
+banned: des / 3des
+banned: rc4
+banned: rsa-1024 and smaller keys
+banned: ecdsa-p192 and smaller curves
+banned: pbkdf2-hmac-sha1 and pbkdf2-hmac-md5
+banned: cbc-mode without ETM for new transports (AEAD preferred)
+banned: static IVs / zero IVs
+banned: testkey in release artifacts (testkey-never-ships, signer-spec.md)
+# Enforcement: scripts/license-check.sh + kdf-registry-check.sh + avb-policy grep.
+
+# --- Part B: lockscreen trivial-PIN blocklist (ch.08 S20) ---
+# halide-pin-derive + Settings -> Security -> Change PIN reject these 50 values
+# (plus repetition of the current PIN). First-boot PIN>=6 has no "skip".
+# 123456 000000 111111 222222 333333 444444 555555 666666 777777 888888 999999
+# 00000 11111 12345 54321 13579 24680 121212 112233 123123 654321 789456 456789
+# birth-year-trivial: 1900-2026 any 4-digit year alone or prefixed (19xx/20xx),
+# repeating pairs (1010 2020 1212 counted above), sequences (012345 987654),
+# keypad walks (147258 369258 159753). Counter logic: list intent fixed here;
+# exact 50-value machine file ships with halide-pin-derive bring-up.

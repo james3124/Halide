@@ -1,0 +1,17 @@
+{
+  "_comment": "PLMN callbox fixture descriptor (ch.07 S28). Lab callbox only; never live-network brute-force scanning. ASCII only. TODO: fill box ID + profile hashes at lab session.",
+  "callbox": "TODO-box-ID",
+  "host_profile_match_required": true,
+  "fake_plmns": [
+    {"plmn": "TODO-PLMN-A-numeric", "tech": "LTE", "role": "home-available"},
+    {"plmn": "TODO-PLMN-B-numeric", "tech": "LTE", "role": "manual-pin-target", "env": "HALIDE_CALLBOX_PLMN_B"}
+  ],
+  "forbidden_fixture": {"plmn": "TODO-PLMN-F-numeric", "expect": "warning-copy + logged-override"},
+  "reject_fixtures": [
+    {"cause": 13, "expect_copy": "automatic-suggest"},
+    {"cause": 17, "expect": "retry-once + S15-cross-check"},
+    {"timeout_s": 120, "expect": "MANUAL-REVERTED + banner"}
+  ],
+  "stale_rule": "scan older than 300s labeled stale",
+  "status": "UNTESTED"
+}

@@ -1,0 +1,5 @@
+HALIDE keys (HALIDE-owned)
+Pubs + metadata ONLY in this dir.
+No privates — scanner-enforced, never commit *.key.
+See security/ for rotation policy.
+Owner: halide-release.

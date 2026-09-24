@@ -1,0 +1,25 @@
+[Unit]
+Description=HALIDE federated settings search index (one search box)
+Documentation=file:hybrid-os-plan/05-debian-systemd-dual-init.md
+After=halide-android.service
+Wants=halide-android.service
+Slice=halide.slice
+
+[Service]
+Type=simple
+User=halide-bridges
+ExecStart=/usr/bin/halide-settings-index --index /home/halide/.cache/halide/settings-index.json
+Restart=on-failure
+RestartSec=5s
+# Search never OOMs Calls (ch.05 section 28): Weight 200 / Max 120M row.
+CPUWeight=200
+MemoryHigh=80M
+MemoryMax=120M
+TasksMax=40
+OOMScoreAdjust=0
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+NoNewPrivileges=yes
+
+[Install]
+WantedBy=halide.slice

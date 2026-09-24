@@ -1,0 +1,49 @@
+#!/bin/sh
+# halide-log-export -- redacted diagnostics tarball (ch.05 sections 2/19).
+# Source: hybrid/debian/scripts/halide-log-export (installed to /usr/sbin/).
+# The one-tap button behind the section 2 crash policy: builds a redacted
+# tarball with manifest (build ID, unit role, journal slice, crash snapshot,
+# plot.svg, unit states, SOCKETS audit diff). Export ABORTS if the redaction
+# tool is missing (never ships raw). Redaction rules: logs/REDACT.rules
+# (IMEI/IMSI/MSISDN/phone-numbers/email/coordinates/BSSID -> <redacted:class>).
+# Exit contract: 0 exported / 1 redaction/collection failed / 2 nothing to export.
+set -eu
+OUT="${HALIDE_LOG_OUT:-/var/lib/halide/diag}"
+REDACT_RULES="${HALIDE_REDACT_RULES:-logs/REDACT.rules}"
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --out) OUT="$2"; shift 2 ;;
+    --redact-rules) REDACT_RULES="$2"; shift 2 ;;
+    -h|--help) echo "usage: $0 [--out DIR] [--redact-rules FILE]"; exit 0 ;;
+    *) echo "ERR bad-arg $1" >&2; exit 1 ;;
+  esac
+done
+
+# Abort without redaction capability (privacy rule, ch.05 section 19).
+if ! command -v halide-redact >/dev/null 2>&1; then
+  echo "halide-log-export: redaction tool missing, export aborted (never ships raw)" >&2
+  exit 1
+fi
+if [ ! -f "$REDACT_RULES" ]; then
+  echo "halide-log-export: rules $REDACT_RULES missing, export aborted" >&2
+  exit 1
+fi
+
+mkdir -p "$OUT"
+STAMP="$(date +%Y%m%d-%H%M%S)"
+WORK="$OUT/export-$STAMP"
+mkdir -p "$WORK"
+journalctl -b --no-pager 2>/dev/null | halide-redact --rules "$REDACT_RULES" > "$WORK/journal.txt" || exit 1
+systemctl list-units --failed --no-pager 2>/dev/null > "$WORK/failed-units.txt" || : > "$WORK/failed-units.txt"
+systemd-analyze plot 2>/dev/null > "$WORK/plot.svg" || echo "<no plot>" > "$WORK/plot.svg"
+if command -v ss >/dev/null 2>&1; then
+  ss -x 2>/dev/null > "$WORK/ss-x.txt" || : > "$WORK/ss-x.txt"
+fi
+{
+  echo "build=$(cat /etc/halide-release 2>/dev/null || echo unknown)"
+  echo "role=$(cat /var/lib/halide/device-role 2>/dev/null || echo unknown)"
+  echo "stamp=$STAMP"
+} > "$WORK/manifest.txt"
+tar -czf "$OUT/halide-logs-$STAMP.tgz" -C "$OUT" "export-$STAMP"
+echo "halide-log-export: $OUT/halide-logs-$STAMP.tgz"
+exit 0

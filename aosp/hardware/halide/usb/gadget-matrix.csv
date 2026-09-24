@@ -1,0 +1,22 @@
+# hardware/halide/usb/gadget-matrix.csv - USB gadget function matrix (S35).
+# Host configfs owns UDC bind + composition; Android IUsb is a state mirror +
+# user consent surface. Unlisted combos refused with USB-COMBO-UNSUPPORTED +
+# metric, never passed to configfs (UDC wedge = P0). midi/eem/ncm out v1
+# (exclusion lifts on: named-music-app need + f_midi validation on sacrificial).
+# Per-release results: hw/<sku>/gadget-matrix.csv (REF-A + radio-subset REF-B).
+# Switch path: halide-usb serializes unbind -> compose -> bind, 2s settle,
+# UDC-WEDGE watchdog (bind-absent >5s -> rebind-previous-known-good + metric).
+state,lsusb, dumpsys_usb,pc_check,adb_auth,notes
+none,charge-only-config,UNCONFIGURED,n/a,offline,suspend-clean (no wakeup source)
+adb,1-adb-iface,ADB,n/a,device-post-auth,keys host-provisioned never container-writable
+mtp,MTP-iface,MTP,100-file-browse+1GB-xfer-CRC-ok,n/a,hash-not-size catches silent truncate
+ptp,PTP-iface,PTP,gphoto2-get-all-files-10-raws,n/a,EXIF-orientation spot-check on pulls
+rndis,RNDIS+DHCP,RNDIS,n/a,n/a,firewall default-deny (tether-surface rule)
+adb+mtp,both-ifaces,ADB+MTP,browse+shell-concurrent-10min,device,function-flap-counter-0
+adb+ptp,both-ifaces,ADB+PTP,pull+shell-concurrent,device,same soak
+midi,refused,USB-COMBO-UNSUPPORTED,n/a,n/a,OUT-v1 (demand counted, scope not widened)
+ncm,refused,USB-COMBO-UNSUPPORTED,n/a,n/a,OUT-v1 (demand counted, scope not widened)
+# Consent: PTP/MTP auto-grant only unlocked; locked -> USB-CONSENT-REQUIRED on
+# host lockscreen + container mirror UNCONFIGURED. Release: ro.debuggable=0,
+# adb root prints production-build refusal string (asserted text, not code).
+# Role-switch interlock: role->host tears down gadget first (dmesg order log).

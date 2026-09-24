@@ -1,0 +1,94 @@
+# halide-base.fragment — phone-editable, builder-compiled
+# Merge order: mainline defconfig <- gki.fragment <- halide-base.fragment <- halide-hardening.fragment <- devices/<sku>/sku.fragment
+# Never patch linux/ in place (ch.03 §11 pristine-tree rule).
+# Each symbol carries its WHY (ch.03 §12 rationale table); verification in §12 Test column.
+
+# Android container essentials (ch.03 §12: ServiceManager never registers without these)
+CONFIG_ANDROID=y
+CONFIG_ANDROID_BINDER_IPC=y
+CONFIG_ANDROID_BINDERFS=y
+CONFIG_ASHMEM=y
+CONFIG_ANDROID_LOW_MEMORY_KILLER=n
+# lmkd in userspace (PSI mode) instead — see low-spec doc §2
+
+# explicit fencing for composer bridge (ch.03 §12: tearing/composer timeout without)
+CONFIG_SW_SYNC=y
+CONFIG_SYNC_FILE=y
+
+# dma-buf path SurfaceFlinger->Wayland (ch.03 §12: black Android windows without)
+CONFIG_DMA_SHARED_BUFFER=y
+CONFIG_DMABUF_HEAPS=y
+CONFIG_DMABUF_HEAPS_SYSTEM=y
+CONFIG_DMABUF_HEAPS_CMA=y
+
+# cgroup v2 single tree (systemd + lmkd PSI requirement, ch.05 §25, ch.03 §12)
+CONFIG_CGROUPS=y
+CONFIG_MEMCG=y
+CONFIG_CGROUP_SCHED=y
+CONFIG_CGROUP_PIDS=y
+CONFIG_CGROUP_FREEZER=y
+CONFIG_CGROUP_DEVICE=y
+CONFIG_CPUSETS=y
+CONFIG_PSI=y
+
+# app sandbox both stacks (ch.03 §12: CTS CtsSeccompTestCases fail without)
+CONFIG_SECCOMP=y
+CONFIG_SECCOMP_FILTER=y
+
+# Android MAC (hardening fragment restates SELINUX with AppArmor/Yama; kept here per §3 merge list)
+CONFIG_SECURITY_SELINUX=y
+CONFIG_SECURITY_SELINUX_BOOTPARAM=y
+CONFIG_DEFAULT_SECURITY_SELINUX=y
+
+# display (ch.03 §12: no /dev/dri/card0 without; Phosh falls to software)
+CONFIG_DRM=y
+CONFIG_DRM_MSM=y
+CONFIG_DRM_PANEL=y
+CONFIG_BACKLIGHT_CLASS_DEVICE=y
+CONFIG_INPUT_TOUCHSCREEN=y
+
+# audio (WCD machine quirks live in vendor_modules/ with UPSTREAMING.md, §4)
+CONFIG_SND_SOC=y
+CONFIG_SND_SOC_QCOM=y
+
+# USB dual-role (ch.03 §15/§35: host ADB + device ADB/MTP; role-switch via extcon)
+CONFIG_USB_DWC3=y
+CONFIG_USB_DWC3_QCOM=y
+
+# modem control + data (ch.03 §12/§14: /dev/cdc-wdm0 missing without; qrtr-lookup green is the gate)
+CONFIG_RPMSG_QCOM_GLINK_RPM=y
+CONFIG_QRTR=y
+CONFIG_QRTR_SMD=y
+CONFIG_RMNET=y
+CONFIG_QMI_HELPERS=y
+
+# suspend / power (4GB tier needs deep sleep residency >90% overnight)
+CONFIG_SUSPEND=y
+CONFIG_PM_SLEEP=y
+CONFIG_PM_SLEEP_DEBUG=y
+CONFIG_PM_WAKELOCKS=y
+# wakelocks as wakeup_source audit only (ch.03 §12: power regressions invisible without)
+
+# timekeeping: PMIC RTC is the single timekeeper (ch.03 §36; hctosys restores wall time pre-systemd)
+CONFIG_RTC_DRV_PM8XXX=y
+CONFIG_RTC_HCTOSYS=y
+
+# sensors at host first (ch.03 §16: sensors HAL consumes IIO; verify in_accel_*_raw on tilt)
+CONFIG_IIO=y
+CONFIG_QCOM_SPMI_ADC5=y
+
+# power domains + clock votes (ch.03 §12: random hangs under load without RPMH)
+CONFIG_REGULATOR_QCOM_RPMH=y
+CONFIG_PINCTRL_MSM=y
+CONFIG_ARM_SMMU=y
+CONFIG_PCIE_QCOM=y
+
+# storage (ch.03 §12: no root mount without; UFS clkscale+hibern8 for idle power, §15)
+CONFIG_UFS_QCOM=y
+CONFIG_MMC_SDHCI_MSM=y
+
+# ramoops for crash survival (per-variant address in devices/<sku>/sku.fragment, §30)
+CONFIG_PSTORE=y
+CONFIG_PSTORE_RAM=y
+CONFIG_PSTORE_RAMOOPS=y
+CONFIG_RAMOOPS=y

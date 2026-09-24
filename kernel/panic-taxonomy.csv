@@ -1,0 +1,8 @@
+class,signature,first_action,owner
+ROOT-MOUNT,"VFS: Cannot open root device or unable to mount blocked dm-verity",pull UART log + avbtool info_image on slot, halide-kernel
+MODEM-CRASH,"rproc: crash detected in modem / qrtr hello dead",pull pstore console-ramoops + qmi-audit.log tail,halide-telephony
+GPU-HANG,"gpu fault fence-timeout / drm atomic commit timeout on DSI-1",pull dmesg gpu section + frame-join.csv window,halide-graphics
+LXC-OOM,"Memory cgroup out of memory: killed process (container)",pull lmkd logcat slice + PSI pressure history,halide-platform
+AVB-RED,"dm-verity verification failed / vbmeta rollback index rejected",halt boot + capture pstore dmesg-ramoops + vbmeta digest,halide-security
+BOOTREASON-UNKNOWN,"bootreason not in reboot,cold,watchdog,resin,alarm,crash vocabulary",file BUG + capture pstore,halide-kernel
+WATCHDOG,"watchdog: BUG: soft lockup / watchdog did not pet",pull pstore console-ramoops + pet log,halide-kernel

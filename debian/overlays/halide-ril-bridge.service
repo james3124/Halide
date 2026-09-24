@@ -1,0 +1,23 @@
+[Unit]
+Description=HALIDE RIL->ModemManager bridge (host owns modem, single-stack)
+PartOf=halide-android.service
+After=halide-android.service ModemManager.service
+Requires=ModemManager.service
+# ch.00 §C registry name; ch.07 §1: no dual masters, one RIL translation path
+Slice=halide.slice
+
+[Service]
+Type=simple
+User=halide-bridges
+SupplementaryGroups=halide-modem
+ExecStart=/usr/sbin/halide-ril-bridge --socket /run/halide/ril.sock
+Restart=on-failure
+RestartSec=2s
+CPUWeight=600
+MemoryHigh=120M
+MemoryMax=200M
+TasksMax=60
+OOMScoreAdjust=-100
+
+[Install]
+WantedBy=halide.slice

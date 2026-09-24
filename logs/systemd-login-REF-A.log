@@ -1,0 +1,15 @@
+// SAMPLE evidence for gate record 1-2-20260814-REF-A — Phase-1 exit bar
+// REDACTED excerpt: journalctl -b -u halide-android.service + login target state.
+// Build: halide-20260814-a3f9c1e2b4d6 · SKU REF-A · serial HALIDE-A1 (IMEI stripped)
+[    2.881034] systemd[1]: Detected architecture arm64.
+[    3.410222] systemd[1]: Reached target Local File Systems.
+[    3.902441] systemd[1]: Started LXC container lifecycle manager helper.
+[    4.128773] systemd[1]: halide-android.service: Deactivated successfully, restarting (backoff 1).
+[    5.774910] systemd[1]: Started halide-android.service.
+[    9.556201] systemd[1]: Reached target Multi-User System.
+[   11.039884] lxc-start[412]: android container: sys.boot_completed=1 (headless, 11.0s)
+[   11.088455] systemd[1]: halide-android.service: main process exited, code=exited, status=0
+[   11.091120] systemd[1]: halide-android.service: Succeeded.
+// multi-user.target reached: active
+// halide-android.service: active (boot_completed=1)
+// binderfs mounted at /dev/binderfs: yes

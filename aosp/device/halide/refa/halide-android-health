@@ -1,0 +1,54 @@
+#!/bin/bash
+# halide-android-health - 30s timer body (ch.04 S15 + S22 layer 2).
+# Checks: getprop sys.boot_completed, service check radio + media.camera +
+# per-HAL service checks (hal-services.txt rows), property assertions
+# (gsm.version.ril-impl, halide.version), learned-FCC persistence note (S34).
+# 3 consecutive failures -> caller restarts halide-android.service (counts
+# toward the 3-crash banner rule, ch.05 S2). Fault-injection (S22 layer 4):
+# killed rild/audioserver/cameraserver must restart-or-banner within 90s.
+# Phone-safe: text checks need only adb or lxc-attach; absent both -> SKIP.
+# Exit 0 healthy / 1 unhealthy (strike recorded) / 2 no input.
+set -eu
+STRIKES="/run/halide-android-health.strikes"
+ATTACH=""
+if command -v lxc-attach >/dev/null 2>&1 && lxc-info -n android 2>/dev/null | grep -q RUNNING; then
+  ATTACH="lxc-attach -n android --"
+elif command -v adb >/dev/null 2>&1 && adb get-state >/dev/null 2>&1; then
+  ATTACH="adb shell"
+else
+  echo "SKIP: no running android container (lxc-attach/adb)"; exit 2
+fi
+FAIL=0
+check() { # check <label> <command...>; failure prints FAIL row, sets FAIL=1
+  L="$1"; shift
+  # shellcheck disable=SC2086
+  if $ATTACH "$@" >/dev/null 2>&1; then echo "ok: $L"; else echo "FAIL: $L"; FAIL=1; fi
+}
+PROP="$(lxc-attach -n android -- getprop sys.boot_completed 2>/dev/null || adb shell getprop sys.boot_completed 2>/dev/null || echo 0)"
+[ "$PROP" = 1 ] && echo "ok: sys.boot_completed=1" || { echo "FAIL: sys.boot_completed=$PROP"; FAIL=1; }
+check "service-radio" service check radio
+check "service-camera" service check media.camera
+check "service-audio" service check media.audio_flinger
+check "service-sensors" service check sensorservice
+check "service-power" service check power
+check "service-health" service check health
+check "service-usb" service check usb
+RILIMPL="$(lxc-attach -n android -- getprop gsm.version.ril-impl 2>/dev/null || adb shell getprop gsm.version.ril-impl 2>/dev/null || true)"
+[ -n "$RILIMPL" ] && echo "ok: gsm.version.ril-impl=$RILIMPL" || { echo "FAIL: gsm.version.ril-impl unset (rild ladder S4)"; FAIL=1; }
+# Learned-FCC persistence across slot switch (S34): host owns the value;
+# container republish must agree within one health tick post-switch.
+if [ -r /sys/class/power_supply/battery/charge_full ]; then
+  echo "ok: learned-FCC readable (host owns battery model, S34)"
+else
+  echo "note: learned-FCC node absent on this host - persistence asserted on HW"
+fi
+if [ "$FAIL" = 0 ]; then
+  echo 0 > "$STRIKES" 2>/dev/null || true
+  echo "halide-android-health: HEALTHY"
+  exit 0
+fi
+N=1; [ -f "$STRIKES" ] && N=$(( $(cat "$STRIKES" 2>/dev/null || echo 0) + 1 ))
+echo "$N" > "$STRIKES" 2>/dev/null || true
+echo "halide-android-health: UNHEALTHY (strike $N/3)"
+[ "$N" -ge 3 ] && echo "ACTION: systemctl restart halide-android.service (3-crash banner rule, ch.05 S2)"
+exit 1

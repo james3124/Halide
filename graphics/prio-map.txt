@@ -1,0 +1,12 @@
+# HALIDE graphics/composer thread priority map (ch06 s12 + ch03 s31 uclamp doctrine)
+# SCHED_FIFO values: lower number = lower urgency. Audio IRQ thread stays top.
+# Format: <thread>=SCHED_FIFO:<prio> uclamp.min=<pct> cpu=<mask-note>
+# Triple-cited: uclamp.min values also appear in audio/<sku>/policy.json and
+# kernel sched notes (ch03 s31). Drift in one file fails review of the others.
+audio-irq=SCHED_FIFO:20 uclamp.min=80 note=top-always
+composer-present=SCHED_FIFO:10 uclamp.min=30 note= wakes on vblank-2ms (panel.json present_margin_ms); below audio, above drawer
+drawer-daemon=SCHED_FIFO:5 uclamp.min=10 note=below composer present
+# Legacy layer Z-order (kept for overlay tests, not scheduling):
+# status=3 app=1 video=2 overlay=0 (Z-order only, ch06 composer-internals s4)
+# PI-futex audit: quarterly. New uclamp.min requests attach power-vs-jank pair or bounce.
+# Verify: chrt -p $(pidof halide-composer) shows present thread FIFO 10.

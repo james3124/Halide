@@ -1,0 +1,37 @@
+# halide-bridges -- AppArmor profile for bridge daemons (host side of every SOCKETS.md socket)
+# Parent: ch.08 S10 (per-bridge socket paths encoded as rules) + S31 (halide-bridge-* rows)
+# Owner: Bridge owner + Security * Review: per-MR + quarterly
+# Rule: a socket not in this profile cannot be bound even if code tries (fail-closed).
+
+#include <tunables/global>
+
+profile halide-bridges flags=(attach_disconnected,mediate_deleted) {
+  #include <abstractions/base>
+
+  # Each bridge binds ONLY its own socket path (SOCKETS.md allowlist, mirrored in qrtr/sepolicy rows)
+  /run/halide/sockets/ril rw,
+  /run/halide/sockets/sms rw,
+  /run/halide/sockets/audio rw,
+  /run/halide/sockets/prop rw,
+  /run/halide/sockets/perm rw,
+  /run/halide/sockets/composer-cmd rw,
+
+  # Cross-bridge peer-to-peer connect is banned (neverallow.te N-10; broker only)
+  deny /run/halide/sockets/* w,
+
+  # Bridges never shell out (mirrors seccomp execve-deny, S10 RCE containment)
+  deny /bin/** x,
+  deny /usr/bin/** x,
+  deny capability sys_admin,
+  deny capability sys_ptrace,
+  deny ptrace,
+  deny network raw,
+  deny network packet,
+
+  # Bridges never touch calibration/NV blocks or key material
+  deny /dev/block/** w,
+  deny /run/halide/keys/** r,
+
+  audit ptrace,
+  audit capability sys_admin,
+}

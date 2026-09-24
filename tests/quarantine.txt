@@ -1,0 +1,2 @@
+# quarantine.txt - empty (0 quarantined). Cap 5 per suite, expiry <=30d + BUG (ch.10 S11).
+# Format when used: <test-name> <BUG-id> <expiry-YYYY-MM-DD> <reason>

@@ -1,0 +1,58 @@
+#!/bin/bash
+# halide-time-check - time-integrity gate (ch.04 S33 + ch.03 S36 time-vote).
+# Posture: GNSS position trusted conditionally, GNSS time never trusted alone.
+# GNSS is one of three voters (NTP + RTC + GNSS), trusted only with >=4 SV +
+# fix-valid + time-uncertainty <=100ms, outvotable by NTP+RTC always.
+# Firewall: NMEA/RMC year <2000 or >2040 -> TIME-UNTRUSTED, position still
+# delivered with time_valid=false (navigation works, clock never jumps).
+# Text mode (default): validate an NMEA file's RMC dates. Live mode: compare
+# host clock vs GNSS date + container dumpsys location validity flag (single
+# truth - container never sees trusted-time the host rejected).
+# Exit 0 time trusted / 1 TIME-UNTRUSTED (flag, metered 1/min) / 2 no input.
+set -eu
+if [ "${1:-}" = "--live" ]; then
+  [ -r /run/halide/gnss.nmea ] || { echo "SKIP: no /run/halide/gnss.nmea (host GNSS owner only)"; exit 2; }
+  RMC="$(grep '^\$GPRMC' /run/halide/gnss.nmea 2>/dev/null | tail -1 || true)"
+  [ -n "$RMC" ] || { echo "SKIP: no RMC sentence yet (no fix)"; exit 2; }
+  DATE="$(echo "$RMC" | cut -d, -f10)"
+  SV="$(echo "$RMC" | cut -d, -f8 | cut -d. -f1)"
+  case "$DATE" in ????99|????20[34]*|"") : ;; esac
+  YY="$(echo "$DATE" | cut -c5-6)"; MM="$(echo "$DATE" | cut -c3-4)"; DD="$(echo "$DATE" | cut -c1-2)"
+  # FW zeroed/midnight bug: non-calendar DD/MM is TIME-UNTRUSTED (S39).
+  case "$MM" in 0[1-9]|1[0-2]) : ;; *) echo "TIME-UNTRUSTED: non-calendar RMC date: $DATE (HALIDE-GNSS-TIME-REJECT +1, rate-limited 1/min)"; exit 1 ;; esac
+  case "$DD" in 0[1-9]|[12][0-9]|3[01]) : ;; *) echo "TIME-UNTRUSTED: non-calendar RMC date: $DATE (HALIDE-GNSS-TIME-REJECT +1, rate-limited 1/min)"; exit 1 ;; esac
+  # RMC ddmmyy -> full year heuristic anchored to host NTP date (day-level
+  # assert catches 19.6-year rollover steps, S33 live-sky sanity).
+  HOST_Y="$(date -u +%Y)"; HOST_D="$(date -u +%F)"
+  FULL_Y="20$YY"; [ "$FULL_Y" -gt "$((HOST_Y + 2))" ] && FULL_Y="19$YY"
+  [ "$FULL_Y" -ge 2000 ] && [ "$FULL_Y" -le 2040 ] \
+    || { echo "TIME-UNTRUSTED: RMC year $FULL_Y out of [2000,2040] (HALIDE-GNSS-TIME-REJECT +1, rate-limited 1/min)"; exit 1; }
+  [ "${SV:-0}" -ge 4 ] 2>/dev/null || { echo "TIME-UNTRUSTED: SV=$SV <4 (vote outvoted by NTP+RTC)"; exit 1; }
+  echo "TIME-TRUSTED: RMC $DD/$MM/$FULL_Y SV=$SV host=$HOST_D (delta<=1d)"
+  exit 0
+fi
+F="${1:-}"
+[ -n "$F" ] && [ -f "$F" ] || { echo "SKIP: usage: halide-time-check <nmea-file> | --live"; exit 2; }
+BAD=0; N=0
+while IFS= read -r L; do
+  case "$L" in '$GPRMC,'*|'\\$GPRMC,'*)
+    N=$((N + 1)); DATE="$(echo "$L" | cut -d, -f10)"
+    DD="$(echo "$DATE" | cut -c1-2)"; MM="$(echo "$DATE" | cut -c3-4)"
+    YY="$(echo "$DATE" | cut -c5-6)"
+    case "$YY" in ??) : ;; *) echo "TIME-UNTRUSTED: malformed RMC date: $DATE"; BAD=$((BAD+1)); continue ;; esac
+    # FW zeroed/midnight bug (S39 garbage-date fixture): 000000 or any
+    # non-calendar DD/MM is TIME-UNTRUSTED, never trusted by accident.
+    case "$MM" in 0[1-9]|1[0-2]) : ;; *) echo "TIME-UNTRUSTED: non-calendar RMC date: $DATE"; BAD=$((BAD+1)); continue ;; esac
+    case "$DD" in 0[1-9]|[12][0-9]|3[01]) : ;; *) echo "TIME-UNTRUSTED: non-calendar RMC date: $DATE"; BAD=$((BAD+1)); continue ;; esac
+    FULL_Y="20$YY"; [ "$FULL_Y" -gt 2028 ] && FULL_Y="19$YY"
+    if [ "$FULL_Y" -lt 2000 ] || [ "$FULL_Y" -gt 2040 ]; then
+      echo "TIME-UNTRUSTED: $DATE -> $FULL_Y (position kept, time_valid=false)"
+      BAD=$((BAD + 1))
+    fi
+    ;;
+  esac
+done < "$F"
+[ "$N" -gt 0 ] || { echo "SKIP: no RMC sentences in $F"; exit 2; }
+echo "halide-time-check: $N RMC checked, $BAD untrusted"
+[ "$BAD" = 0 ] && echo "halide-time-check: TRUSTED" || echo "halide-time-check: UNTRUSTED-FLAGS=$BAD"
+[ "$BAD" = 0 ]

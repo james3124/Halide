@@ -1,0 +1,9 @@
+id,task,stack,pass_bar
+SR-01,Unlock with PIN via SR,Phosh lock,3/3 unaided <=60s
+SR-02,Place call via GNOME Calls,host,dial + hangup announced <=90s
+SR-03,Read + reply SMS in Chats,host,message text spoken verbatim
+SR-04,Open Android app from drawer,bridge,badge + label announced launch <=10s
+SR-05,Revoke location in one place,both,revocation confirmed both stacks <=10s
+SR-06,Join Wi-Fi + read signal,Settings/NM,SSID + connected state announced
+SR-07,Install F-Droid app update,container,progress + done announced
+SR-08,Emergency dialer reach,host,reachable <=3 gestures from lock

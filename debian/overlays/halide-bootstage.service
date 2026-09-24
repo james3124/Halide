@@ -1,0 +1,21 @@
+[Unit]
+Description=HALIDE boot-stage animation + crash-banner arming
+After=phosh.service
+Wants=phosh.service
+# ch.00 §C registry name; ch.05/06: animation on boot, arms sys.halide.crash_banner
+Slice=halide.slice
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/halide-bootstage start
+ExecStop=/usr/bin/halide-bootstage stop
+# Arming contract (ch.00 registry A): sets sys.halide.crash_banner=armed on start;
+# container crash path flips it to fired:<ts> via prop bridge (allowlisted).
+CPUWeight=300
+MemoryHigh=80M
+MemoryMax=120M
+TasksMax=40
+
+[Install]
+WantedBy=graphical.target

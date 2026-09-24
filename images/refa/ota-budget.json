@@ -1,0 +1,20 @@
+{
+  "sku": "refa",
+  "full_cap_B": 4831838208,
+  "full_cap_note": "4.5G hard cap per payload; full + metadata + signatures <= 5G wire",
+  "delta_soft_B": 1288490189,
+  "delta_hard_B": 2147483648,
+  "delta_note": "1.2G soft warn + notes line, 2.0G hard drop to full-only",
+  "fleet_cap_B": 8589934592,
+  "fleet_cap_note": "8GB rule: full + sum(served incrementals) + 1 retry each <= 8G per from-version",
+  "delta_ship_ratio": 0.6,
+  "delta_ship_note": "ship incremental only if <= 60 pct of full AND <= hard cap, else delta-skipped:<reason>",
+  "chunk_cap_B": 104857600,
+  "chunk_note": "100M per-file bsdiff hunk cap; larger hunks fall back to full-file deflate, logged per-file",
+  "compressor": "xz -9 --threads=0 --check=crc64",
+  "compressor_note": "pinned per release in MANIFEST.lock, never floated",
+  "block_size": 4096,
+  "block_note": "must match erofs -C4096; CI asserts the match",
+  "dictionary_sha": "TODO-builder-fills-previous-super-sparse-header",
+  "metadata_cap_B": 65536
+}

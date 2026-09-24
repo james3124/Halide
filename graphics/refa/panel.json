@@ -1,0 +1,18 @@
+{
+  "panel": "variant-A-TEMPLATE",
+  "tech": "UNMEASURED: amoled|lcd (sec06-s27 gate; LCD files BURNIN-N/A)",
+  "resolution": [1080, 2280],
+  "dsi_lanes": 4,
+  "mode": {"clock_khz": "TODO-measured: DSI clock kHz (modetest, proc display-calibration s2)", "hfp": "TODO-measured", "hbp": "TODO-measured", "vfp": "TODO-measured", "vbp": "TODO-measured"},
+  "backlight": {"driver": "pmi8998-wled", "max_nits": "TODO-measured: lux-meter 7pt curve (display-calibration s2)", "curve": "TODO-measured: [nits ascending, min 5pts]", "measured": false, "meter": "TODO-measured: meter model+serial", "date": "TODO-measured: YYYY-MM-DD", "operator": "TODO-measured"},
+  "white": {"cct_k": "TODO-measured", "x": "TODO-measured", "y": "TODO-measured", "measured": false},
+  "gamma": "TODO-measured: ~2.2 + residual",
+  "modifiers": ["LINEAR"],
+  "touch_matrix": [[1, 0, 0], [0, 1, 0]],
+  "touch_residual_px": "TODO-measured: <8px (ch06 s7 5-point x3 least-squares)",
+  "rotation_quirks": [],
+  "hdr": "none",
+  "present_margin_ms": "TODO-measured: vsync sweep knee + 0.5ms corner headroom (ch06 s25)",
+  "psr": {"supported": "TODO-measured: true|false", "measured_win_ma": "TODO-measured", "enabled": false},
+  "dimming": {"mode": "TODO-measured: pwm|dc|hybrid", "pwm_hz": "TODO-measured: scope, not datasheet", "min_duty_pct": "TODO-measured", "dc_crossover_nits": "TODO-measured"}
+}

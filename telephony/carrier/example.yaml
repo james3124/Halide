@@ -1,0 +1,13 @@
+# carrier profile — example only, phone-safe text (no radio exec)
+id: example-mcc001-mnc01
+mcc: "001"
+mnc: "01"
+carrier: Example
+apn: internet
+user: ""
+auth: none
+bands: [3, 7, 20]
+volte: best-effort
+emergency: "UNTESTED"
+smsc: +100
+# note: real overlays added on builder; phone edits text only

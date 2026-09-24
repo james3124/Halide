@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- halide KABI snapshot for LTS 6.6 (ch.03 §41 ABI-pin procedure). Pin: layout of structs vendor modules deref. -->
+<!-- Generated on builder; committed baseline; diffs gate as ABI-UNCHANGED | ABI-ADDITIVE-ONLY | ABI-BREAK. -->
+<abi lts="6.6" kmi="halide-6.6-v1" generated="2026-08-14">
+  <struct name="file" size="232">
+    <member name="f_count" type="atomic_long_t" offset="56"/>
+    <member name="f_mode" type="rwf_t" offset="72"/>
+    <member name="f_op" type="const struct file_operations *" offset="80"/>
+    <member name="private_data" type="void *" offset="176"/>
+  </struct>
+  <struct name="task_struct" size="9344">
+    <member name="pid" type="pid_t" offset="1232"/>
+    <member name="comm" type="char [16]" offset="2376"/>
+    <member name="flags" type="unsigned int" offset="704"/>
+  </struct>
+  <struct name="sock" size="1024">
+    <member name="sk_family" type="unsigned short" offset="24"/>
+    <member name="sk_protocol" type="unsigned char" offset="26"/>
+    <member name="sk_state" type="unsigned char" offset="27"/>
+  </struct>
+</abi>

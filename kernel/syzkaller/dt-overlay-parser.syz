@@ -1,0 +1,6 @@
+# dt-overlay-parser.syz — syzkaller description for the DT-overlay apply path fuzz (ch.03 §23).
+# Covers: unflatten_dt with malformed #cells / missing status / oversized strings —
+# wrong #cells must yield graceful -EINVAL, never oops (§23 KUnit rule mirrors this).
+# Owner: halide-kernel. Status: description stub — builder expands against pinned LTS.
+syz_dt_apply(blob: ptr[in, array[int8]], len len[blob])
+syz_dt_parse_phandle(blob: ptr[in, array[int8]], phandle int32)

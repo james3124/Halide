@@ -1,0 +1,9 @@
+# pkg source [disabled] — committed mirror of the tests/drawer-shim.sh fixture (ch.05 §13).
+# Manual runs: python3 bridges/drawer_shim.py tests/drawer-fixture/pm-list.txt apps/drawer/hide.conf /tmp/drawer-out
+org.fdroid.fdroid fdroid
+org.wikimedia.wikipedia fdroid user
+com.android.dialer aosp
+com.google.android.gms aosp
+org.thoughtcrime.securesms fdroid user
+org.thoughtcrime.securesms aurora
+com.example.game fdroid user disabled

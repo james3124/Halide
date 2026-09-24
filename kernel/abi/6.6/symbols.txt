@@ -1,0 +1,20 @@
+# symbols.txt — pinned KMI symbol list, LTS 6.6 baseline (ch.03 §41)
+# One symbol per line; vendor modules may only reference symbols below (+ allowlisted additive set).
+# Diff output: ABI-UNCHANGED (empty) | ABI-ADDITIVE-ONLY (new names only) | ABI-BREAK (nonzero exit).
+register_binder_device
+binder_alloc_new_buf
+alloc_chrdev_region
+cdev_init
+cdev_add
+device_create
+device_destroy
+of_find_node_by_name
+of_property_read_u32
+of_platform_populate
+regulator_get
+regulator_enable
+drm_atomic_helper_commit
+drm_bridge_attach
+platform_driver_register
+iio_device_register
+qrtr_endpoint_register

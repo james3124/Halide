@@ -1,0 +1,13 @@
+{
+  "_comment": "Modem FW blessing pointer for 310260 (ch.07 S23 + modem-fw-qualification). FW version is a dimension of every blessing; any FW change expires blessings to STALE-FW. BLOB-SHA256 filled by the builder at flash/intake time -- NEVER invent hashes. ASCII only.",
+  "sku": "TODO",
+  "modem_fw_version": "TODO",
+  "modem_fw_blob_sha256": "TODO-builder-SHA (modem-fw-qualification S1 intake: vendor blob + signed SHA256 file; INTAKE.log records blob hash + manifest hash + receiver + date)",
+  "carrier_approval": "TODO (approved / pending / N/A + carrier notice ID + expiry; pending FW runs in RF lab ONLY, never field/factory/OTA)",
+  "blessed_fw": ["TODO (list of FW versions this carrier blessed against; profile.json blessed_fw mirrors this)"],
+  "blessing_state": "UNTESTED (blessed / STALE-FW / RE-QUALIFY / UNTESTED / UNBLESSED-<carrier>)",
+  "rollback_fw_version": "TODO (prior blessed FW; partial/delta modem flashes forbidden)",
+  "rollback_fw_blob_sha256": "TODO-builder-SHA",
+  "pre_upgrade_baselines": "TODO (stall-rate + voice-quality trailing 2 weeks, recorded before any flash)",
+  "status": "UNTESTED"
+}

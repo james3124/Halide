@@ -1,0 +1,21 @@
+[Unit]
+Description=HALIDE Bluetooth (host owns HCI, Android sees bridged HFP)
+After=bluetooth.service
+# ch.07 §12: host BlueZ owns HCI; Android never gets raw HCI access.
+Slice=halide.slice
+
+[Service]
+Type=simple
+ExecStart=/usr/sbin/halide-bt-bridge --socket /run/halide/bt.sock \
+  --state-dir /var/lib/halide/bt
+Restart=on-failure
+RestartSec=3s
+# ch.05 §25 table class: bridge (ril/netd row budgets applied until measured)
+CPUWeight=600
+MemoryHigh=120M
+MemoryMax=200M
+TasksMax=60
+OOMScoreAdjust=-100
+
+[Install]
+WantedBy=halide.slice

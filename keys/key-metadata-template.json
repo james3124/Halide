@@ -1,0 +1,15 @@
+{
+  "schema": "halide-key-metadata-v1",
+  "note": "Template only (signer-spec.md). Copy to keys/<sku>/<name>-metadata.json per key. Pubs as <name>.x509.pem beside it. No private bytes ever.",
+  "key_id": "TODO (e.g. halide-refa-avb-n3)",
+  "algorithm": "TODO (RSA4096 | EC-P256)",
+  "format_in_tree": "TODO (<name>.x509.pem pub only)",
+  "fingerprint_sha256": "TODO (read aloud + recorded at ceremony)",
+  "created": "TODO (YYYY-MM-DD)",
+  "rotation_due": "TODO (YYYY-MM-DD)",
+  "custodian_initials": "TODO (any-2-of-3 per custodians.md)",
+  "purpose": "TODO (avb | ota | root-emergency-only | research-never-release)",
+  "rollback_train": "TODO (monthly +1 / hotfix reuse / major +10; REF-B independent counter)",
+  "supersedes": "TODO (previous key id, or none)",
+  "transparency_id": "TODO (halide-transparency entry)"
+}

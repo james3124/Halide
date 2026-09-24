@@ -1,0 +1,13 @@
+# vendor/halide/vendor-etc-mappings.txt - /vendor/etc install map (ch.04 S16).
+# source (this tree) -> installed path in the vendor image. Device specifics
+# live in vendor + device/halide; system core init untouched (GSI-compat S2).
+vendor/halide/lmkd.conf -> /vendor/etc/lmkd.conf (lmkd params, ch.03 S34)
+vendor/halide/refa/sensors_config.json -> /vendor/etc/sensors_config.json (multihal handle map, S21/S38)
+device/halide/sepolicy/file_contexts.halide -> /vendor/etc/selinux/vendor_file_contexts (deltas only, S14)
+device/halide/refa/manifest.xml -> /vendor/etc/vintf/manifest.xml (assembled vintf object, S19)
+device/halide/refa/compatibility_matrix.xml -> /system/etc/vintf/compatibility_matrix.xml (S19)
+hardware/halide/usb/gadget-matrix.csv -> /vendor/etc/usb/gadget-matrix.csv (IUsb consent surface, S35)
+hardware/halide/power/power-hint-values.conf -> /vendor/etc/power/power-hint-values.conf (IPower runbook values, S21)
+hardware/halide/thermal/severity-map.csv -> /vendor/etc/thermal/severity-map.csv (IThermal thresholds, S25)
+# Guard: installed /vendor/etc contents are enumerated at build; unmapped
+# files in vendor/halide fail the build (no silent vendor drift, S23).

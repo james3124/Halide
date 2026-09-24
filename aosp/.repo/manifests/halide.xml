@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- halide.xml manifest stub — NO sync, revs are TODO -->
+<manifest>
+  <remote name="halide" fetch="https://example.com/halide" />
+  <default remote="halide" revision="TODO" sync-j="4" />
+  <project name="device/halide/refa" path="device/halide/refa" revision="TODO-r1" />
+  <project name="vendor/halide" path="vendor/halide" revision="TODO-r1" />
+  <project name="hardware/halide" path="hardware/halide" revision="TODO-r1" />
+  <project name="kernel/halide" path="kernel/halide" revision="TODO-r1" />
+  <!-- TODO: pin revs to tagged releases before first sync -->
+  <!-- TODO: add upstream AOSP remote when network allows -->
+  <!-- text-only stub: do not run repo sync from phone -->
+  <!-- owner: halide-aosp -->
+  <!-- license: Apache-2.0 -->
+</manifest>

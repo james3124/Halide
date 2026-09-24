@@ -1,0 +1,15 @@
+# android.conf.in — LXC container pins (ch.05 §13, generated to /var/lib/lxc/android/config — never hand-edited on device)
+lxc.apparmor.profile = lxc-android
+lxc.seccomp.profile = /var/lib/lxc/android/seccomp.policy
+lxc.rootfs.path = dir:/data/android/rootfs
+lxc.mount.entry = /dev/binderfs dev/binderfs none bind,create=dir 0 0
+lxc.mount.entry = /dev/dri dev/dri none bind,ro,create=dir 0 0
+lxc.cgroup2.memory.high = 75%RAM
+lxc.cgroup2.memory.max = 85%RAM
+lxc.cgroup2.pids.max = 800
+lxc.cap.drop = sys_module sys_rawio sys_boot sys_time mac_admin mac_override
+lxc.cap.keep = net_bind_service setuid setgid
+# /mnt/android/{system,vendor} bind mounts: read-only + dm-verity (ch.00 §B registry)
+lxc.mount.entry = /mnt/android/system mnt/android/system none bind,ro,create=dir 0 0
+lxc.mount.entry = /mnt/android/vendor mnt/android/vendor none bind,ro,create=dir 0 0
+# modem stays host-owned (ch.07 §1): NO qrtr device passthrough to container

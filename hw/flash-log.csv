@@ -1,0 +1,4 @@
+serial,date,adapter,cable,result,notes
+SAMPLE-HALIDE-A1,2026-08-03,UART-GOLDEN-01,CBL-GOLDEN-01,PASS,slot A flash 11m20s; AVB lock confirmed
+SAMPLE-HALIDE-A2,2026-08-04,UART-GOLDEN-02,CBL-GOLDEN-02,PASS,slot B flash + first-boot smoke green
+SAMPLE-HALIDE-A3,2026-08-06,UART-GOLDEN-01,CBL-RET-014,FAIL,fastboot failed both orientations; cable DESTROY-labeled (CC lie)

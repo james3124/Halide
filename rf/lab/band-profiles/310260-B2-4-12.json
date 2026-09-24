@@ -1,0 +1,1 @@
+{"_comment": "Band-lock profile 310260 B2/B4/B12 (rf-lab-spec S3 + carrier-lab-handbook S3). Every locked run names this file. ASCII only.", "carrier": "310260", "bands": ["B2", "B4", "B12"], "lock_commands": "TODO-per-callbox", "expected_mcc_mnc": "310260", "fallback_unlock_procedure": "TODO", "status": "UNTESTED"}

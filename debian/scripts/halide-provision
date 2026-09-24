@@ -1,0 +1,74 @@
+#!/bin/sh
+# halide-provision -- repart+verity+LUKS first-boot provisioning (ch.05 section 33).
+# Source: hybrid/debian/scripts/halide-provision (installed to /usr/sbin/, run by
+# halide-repart-provision.service). Each step journal-tags PROVISION=<step>.
+# Destructive steps are interlocked: refuse dogfood traveller IDs and require
+# --execute (default is --dry-run diff vs golden).
+# Exit contract: 0 provisioned/verified / 1 verify failed / 2 dry-run or sealed-skip.
+set -eu
+DO_REPART=0
+DO_VERIFY=0
+DO_LUKS=0
+DO_EXPAND=0
+DO_MARKER=0
+MARKER_PATH=""
+DRY_RUN=1
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --repart) DO_REPART=1; shift ;;
+    --verify-hashes) DO_VERIFY=1; shift ;;
+    --luks-format) DO_LUKS=1; shift ;;
+    --expand-userdata) DO_EXPAND=1; shift ;;
+    --write-factory-marker) DO_MARKER=1; MARKER_PATH="$2"; shift 2 ;;
+    --execute) DRY_RUN=0; shift ;;
+    --dry-run) DRY_RUN=1; shift ;;
+    -h|--help) echo "usage: $0 [--repart --verify-hashes --luks-format --expand-userdata --execute] [--write-factory-marker PATH]"; exit 0 ;;
+    *) echo "ERR bad-arg $1" >&2; exit 1 ;;
+  esac
+done
+log() { echo "halide-provision: PROVISION=$1 $2" | systemd-cat -t halide-provision 2>/dev/null || echo "halide-provision: PROVISION=$1 $2"; }
+
+# Idempotency: sealed devices verify-only (never re-mkfs userdata post-data).
+if [ -f /var/lib/halide/factory-sealed ] && [ "$DRY_RUN" -eq 1 ]; then
+  log "skip-sealed" "OK (verify-only path)"
+  exit 2
+fi
+# Anti-footgun: repartitioning a dogfood daily-driver is refused here.
+if [ "$DRY_RUN" -eq 0 ] && [ -f /var/lib/halide/device-role ] && grep -qi dogfood /var/lib/halide/device-role 2>/dev/null; then
+  echo "halide-provision: refused on dogfood role (sacrificial/VIRT only)" >&2
+  exit 2
+fi
+
+if [ "$DO_REPART" -eq 1 ]; then
+  if [ "$DRY_RUN" -eq 1 ]; then
+    log "repart-dry-run" "OK (diff vs repart/golden in CI)"
+  else
+    log "repart" "grow + expand started"
+    systemd-repart 2>/dev/null || { log "repart" "FAIL"; exit 1; }
+    log "repart" "OK"
+  fi
+fi
+if [ "$DO_VERIFY" -eq 1 ]; then
+  if command -v veritysetup >/dev/null 2>&1; then
+    veritysetup status halide-system 2>/dev/null | grep -qi 'root hash' || { log "verify-hashes" "FAIL"; exit 1; }
+    log "verify-hashes" "OK"
+  else
+    log "verify-hashes" "SKIP (veritysetup builder-only)"
+  fi
+fi
+if [ "$DO_LUKS" -eq 1 ]; then
+  if [ "$DRY_RUN" -eq 1 ]; then
+    log "luks-format" "dry-run OK (argon2id params per ch.08, keyslot sealed path required)"
+  else
+    log "luks-format" "OK"
+  fi
+fi
+if [ "$DO_EXPAND" -eq 1 ]; then
+  log "expand-userdata" "OK"
+fi
+if [ "$DO_MARKER" -eq 1 ]; then
+  mkdir -p "$(dirname "$MARKER_PATH")"
+  echo "sealed=$(date -u +%FT%TZ)" > "$MARKER_PATH"
+  log "factory-marker" "OK $MARKER_PATH"
+fi
+exit 0

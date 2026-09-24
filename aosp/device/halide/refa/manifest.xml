@@ -1,0 +1,165 @@
+<manifest version="1.0" type="device" target-level="8">
+  <!-- device/halide/refa/manifest.xml - VINTF device HAL manifest (ch.04 S19).
+       Every HAL from S3 with interface version + instance + transport.
+       checkvintf runs in CI; drift fails the build (usually a HAL bump
+       without manifest update, S18 step-4 companion). Skew matrix (S24):
+       N/N, N+1/N, N/N+1, N-1-archive cells run per bump MR. -->
+  <hal format="hidl">
+    <name>android.hardware.audio</name>
+    <transport>hwbinder</transport>
+    <version>7.1</version>
+    <interface>
+      <name>IDevicesFactory</name>
+      <instance>primary</instance>
+    </interface>
+  </hal>
+  <hal format="hidl">
+    <name>android.hardware.audio.effect</name>
+    <transport>hwbinder</transport>
+    <version>7.0</version>
+    <interface>
+      <name>IEffectsFactory</name>
+      <instance>default</instance>
+    </interface>
+    <!-- v1 pass-through only; single-EQ proof in audio/<sku>/effects-cert.csv (S30) -->
+  </hal>
+  <hal format="hidl">
+    <name>android.hardware.camera.provider</name>
+    <transport>hwbinder</transport>
+    <version>2.7</version>
+    <interface>
+      <name>ICameraProvider</name>
+      <instance>halide_0</instance>
+    </interface>
+  </hal>
+  <hal format="hidl">
+    <name>android.hardware.sensors</name>
+    <transport>hwbinder</transport>
+    <version>2.1</version>
+    <interface>
+      <name>ISensors</name>
+      <instance>multihal</instance>
+    </interface>
+  </hal>
+  <hal format="hidl">
+    <name>android.hardware.gnss</name>
+    <transport>hwbinder</transport>
+    <version>2.1</version>
+    <interface>
+      <name>IGnss</name>
+      <instance>default</instance>
+    </interface>
+  </hal>
+  <hal format="hidl">
+    <name>android.hardware.radio</name>
+    <transport>hwbinder</transport>
+    <version>1.6</version>
+    <interface>
+      <name>IRadio</name>
+      <instance>slot1</instance>
+    </interface>
+  </hal>
+  <hal format="hidl">
+    <name>android.hardware.drm</name>
+    <transport>hwbinder</transport>
+    <version>1.4</version>
+    <interface>
+      <name>IDrmFactory</name>
+      <instance>widevine</instance>
+    </interface>
+    <!-- L3 only v1; L1 is a non-goal (S13) -->
+  </hal>
+  <hal format="hidl">
+    <name>android.hardware.keymaster</name>
+    <transport>hwbinder</transport>
+    <version>4.1</version>
+    <interface>
+      <name>IKeymasterDevice</name>
+      <instance>software</instance>
+    </interface>
+    <!-- software-backed v1; hardware TEE is Phase-4 stretch (S13) -->
+  </hal>
+  <hal format="hidl">
+    <name>android.hardware.gatekeeper</name>
+    <transport>hwbinder</transport>
+    <version>1.0</version>
+    <interface>
+      <name>IGatekeeper</name>
+      <instance>software</instance>
+    </interface>
+  </hal>
+  <hal format="hidl">
+    <name>android.hardware.power</name>
+    <transport>hwbinder</transport>
+    <version>5.0</version>
+    <interface>
+      <name>IPower</name>
+      <instance>default</instance>
+    </interface>
+  </hal>
+  <hal format="aidl">
+    <name>android.hardware.light</name>
+    <transport>aidl</transport>
+    <version>1</version>
+    <interface>
+      <name>ILights</name>
+      <instance>default</instance>
+    </interface>
+  </hal>
+  <hal format="aidl">
+    <name>android.hardware.vibrator</name>
+    <transport>aidl</transport>
+    <version>1</version>
+    <interface>
+      <name>IVibrator</name>
+      <instance>default</instance>
+    </interface>
+  </hal>
+  <hal format="aidl">
+    <name>android.hardware.health</name>
+    <transport>aidl</transport>
+    <version>1</version>
+    <interface>
+      <name>IHealth</name>
+      <instance>default</instance>
+    </interface>
+  </hal>
+  <hal format="aidl">
+    <name>android.hardware.usb</name>
+    <transport>aidl</transport>
+    <version>1</version>
+    <interface>
+      <name>IUsb</name>
+      <instance>default</instance>
+    </interface>
+  </hal>
+  <hal format="aidl">
+    <name>android.hardware.thermal</name>
+    <transport>aidl</transport>
+    <version>1</version>
+    <interface>
+      <name>IThermal</name>
+      <instance>default</instance>
+    </interface>
+    <!-- v1 minimal: getTemperatures + registerThermalChangedCallback (S25) -->
+  </hal>
+  <hal format="aidl">
+    <name>android.hardware.power.stats</name>
+    <transport>aidl</transport>
+    <version>1</version>
+    <interface>
+      <name>IPowerStats</name>
+      <instance>default</instance>
+    </interface>
+  </hal>
+  <hal format="hidl">
+    <name>android.hardware.bluetooth.audio</name>
+    <transport>hwbinder</transport>
+    <version>2.1</version>
+    <interface>
+      <name>IBluetoothAudioProvidersFactory</name>
+      <instance>default</instance>
+    </interface>
+    <!-- software-pcm v1; offload gated CLOSED (S40) -->
+  </hal>
+</manifest>

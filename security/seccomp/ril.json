@@ -1,0 +1,13 @@
+{
+  "schema": "halide-seccomp-v1",
+  "bridge": "ril",
+  "default_action": "SCMP_ACT_ERRNO",
+  "notes": "QMI/QRTR path (ch.07 S1/S15). execve + ptrace denied (ch.08 S10).",
+  "syscalls": [
+    {"names": ["read", "write", "recvmsg", "sendmsg", "poll", "epoll_wait", "epoll_ctl"], "action": "SCMP_ACT_ALLOW", "reason": "event-loop + QRTR socket IO"},
+    {"names": ["ioctl"], "action": "SCMP_ACT_ALLOW", "reason": "binder + qmi_wwan node ioctl only (node allowlist in AppArmor/sepolicy)"},
+    {"names": ["openat", "close", "fstat", "mmap", "munmap"], "action": "SCMP_ACT_ALLOW", "reason": "minimal runtime linkage, no exec"},
+    {"names": ["futex", "nanosleep", "clock_gettime", "getpid", "gettid"], "action": "SCMP_ACT_ALLOW", "reason": "threading + timers"},
+    {"names": ["execve", "execveat", "ptrace", "process_vm_writev", "kexec_load"], "action": "SCMP_ACT_ERRNO", "reason": "RCE containment: no shell-out, no cross-process poke (binding)"}
+  ]
+}

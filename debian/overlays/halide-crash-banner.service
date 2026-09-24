@@ -1,0 +1,22 @@
+[Unit]
+Description=HALIDE crash banner (Android unavailable, one-tap log export)
+Documentation=file:hybrid-os-plan/05-debian-systemd-dual-init.md
+After=phosh.service halide-android.service
+Wants=phosh.service
+Slice=halide.slice
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+# Arming contract: sets sys.halide.crash_banner=armed on boot (see
+# halide-bootstage.service); container crash path flips it to fired:<ts> via
+# the prop bridge. 3 rapid crashes stop auto-restart, Phosh shows the banner
+# with log export (never boot-loops the whole phone, ch.05 section 2).
+ExecStart=/usr/sbin/halide-crash-banner --arm
+TimeoutSec=30s
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+NoNewPrivileges=yes
+
+[Install]
+WantedBy=graphical.target

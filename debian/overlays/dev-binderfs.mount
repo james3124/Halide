@@ -1,0 +1,17 @@
+[Unit]
+Description=binderfs mount for the Android container
+Documentation=file:hybrid-os-plan/05-debian-systemd-dual-init.md
+DefaultDependencies=no
+After=systemd-modules-load.service
+Before=halide-early.service halide-android.service
+Requires=systemd-modules-load.service
+ConditionPathExists=/sys/fs/binderfs
+
+[Mount]
+What=binderfs
+Where=/dev/binderfs
+Type=binderfs
+Options=nodev,noexec,nosuid
+
+[Install]
+WantedBy=sysinit.target

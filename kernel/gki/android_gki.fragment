@@ -1,0 +1,14 @@
+# android_gki.fragment — GKI 2.0 baseline reference (ch.03 §3 step 2 in merge order).
+# This file is a PHONE-SAFE STUB: the real fragment is extracted from the GKI common
+# tree (android/gki_defconfig) on the builder and diffed against this stub.
+# Builder procedure: copy android/gki_defconfig from the pinned common SHA in
+# MANIFEST.kernel into kernel/gki/android_gki.fragment, then re-run the merge-order
+# check (ci/kernel-pipeline.yml build-matrix re-merges in documented order §3 and
+# diffs against committed defconfig.merged — order drift fails fast, §25).
+# GKI release notes pin the clang toolchain (currently clang-r498229+, §2/§11/§32).
+# Never hand-edit GKI symbols here to paper over a sku.fragment conflict;
+# conflicts resolve in halide-base.fragment or devices/<sku>/sku.fragment with WHY.
+CONFIG_ANDROID_GKI=y
+# NOTE(builder): replace this stub line with the full android/gki_defconfig content.
+# Verification: scripts/kconfig/merge_config.sh --check lists this file non-empty;
+# full KMI gate (scripts/abi-gate.py, §41) runs on the builder with the real fragment.

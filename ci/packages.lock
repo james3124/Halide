@@ -1,0 +1,18 @@
+# packages.lock — version pins for debian/packages.host (bookworm-20260101 snapshot, MANIFEST.lock).
+# Format: name=version  # why (mirrors packages.host WHY comments, ch.05 §8).
+# Builder fetch stage verifies pins against snapshot.debian.org; mismatch fails the pin check
+# (ch.09 §13 supply-chain discipline). Phone edits WHY, builder verifies versions. NO-COMPILE here.
+
+systemd=252.36-1~deb12u1  # PID1, required
+udev=252.36-1~deb12u1  # device nodes for binder/ashmem/graphics (same source as systemd)
+network-manager=1.42.4-1  # owns Wi-Fi/LTE single-stack (FR-04)
+modemmanager=1.20.4-1  # host owns modem (ch.07 §1)
+pipewire=0.3.65-2  # single audio server (FR-05)
+wireplumber=0.4.13-1  # pipewire session policy
+phosh=0.21.0+ds-1  # primary home, <=450MB idle budget
+phoc=0.21.0-1  # compositor
+feedbackd=0.4.1-1  # haptics for permission/call alerts (a11y)
+lxc=5.0.2-1  # Android container runtime
+cryptsetup=2:2.6.1-4~deb12u2  # LUKS2 userdata (AES-256-XTS)
+veritysetup=2:2.6.1-4~deb12u2  # dm-verity strict (same source as cryptsetup)
+tpm2-tools=5.5-1  # reserved, no daemon by default (keep PSS low)

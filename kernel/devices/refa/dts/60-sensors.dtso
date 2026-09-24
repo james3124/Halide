@@ -1,0 +1,29 @@
+/dts-v1/; /plugin/;
+/* 60-sensors.dtsi — REF-A IIO accel/gyro/mag/pressure/als/prox (appendix-03A §1, ch.03 §16).
+ * SRC: stock-dump (IIO compatibles + mount matrix) + measured-20260502 (ALS/prox thresholds
+ * with finger + lux meter; magnetometer factory cal blob path in sensors/<sku>/ doc).
+ * Host-first verify: iio_info + in_accel_*_raw changes on tilt before HAL work.
+ */
+/ {
+	fragment@0 {
+		target = <&spi8>;
+		__overlay__ {
+			status = "okay"; /* SRC: stock-dump */
+			accel_gyro@0 {
+				compatible = "st,lsm6dsm"; /* SRC: stock-dump */
+				reg = <0>;
+			};
+		};
+	};
+	fragment@1 {
+		target = <&i2c3>;
+		__overlay__ {
+			status = "okay"; /* SRC: stock-dump */
+			proximity@60 {
+				compatible = "ams,tmd2725"; /* SRC: stock-dump */
+				reg = <0x60>;
+				proximity-near-level = <200>; /* SRC: measured-20260502 — finger test */
+			};
+		};
+	};
+};

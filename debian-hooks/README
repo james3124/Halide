@@ -1,0 +1,4 @@
+# debian-hooks
+Hook order: preinst -> postinst -> prerm -> postrm.
+Keep hooks text-only, phone-safe, `set -eu`.
+See `debian/` for package hook wiring.

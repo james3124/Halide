@@ -1,0 +1,22 @@
+[Unit]
+Description=HALIDE CPU frequency policy (schedutil, per-SKU caps)
+Documentation=file:hybrid-os-plan/05-debian-systemd-dual-init.md
+After=sysinit.target
+Before=halide-android.service
+# Skip-safe on SKUs without cpufreq (VIRT): condition, not Requires (there is
+# no aggregate sys-devices-system-cpu.device unit to require).
+ConditionPathExists=/sys/devices/system/cpu/cpufreq
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+# Idle phones sip: every wake has a budget line (ch.05 section 21). Governor
+# set here, numeric caps per SKU in power/BG-BUDGET.md companion file.
+ExecStart=/bin/sh -c 'for g in /sys/devices/system/cpu/cpufreq/policy*/scaling_governor; do [ -e "$g" ] && echo schedutil > "$g" || true; done'
+ExecStart=/bin/sh -c 'echo "halide-cpufreq: governor=schedutil applied" | systemd-cat -t halide-cpufreq'
+# BUDGET: runs once per boot, no periodic wake (ch.05 section 21).
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+
+[Install]
+WantedBy=sysinit.target

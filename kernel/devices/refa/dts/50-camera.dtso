@@ -1,0 +1,18 @@
+/dts-v1/; /plugin/;
+/* 50-camera.dtsi — REF-A CAMSS + sensor nodes + flash + eeprom (appendix-03A §1).
+ * SRC: stock-dump (CAMSS pipeline, sensor compatibles) + datasheet sensor p4 (mclk + voltages).
+ * Out-of-tree CAMSS deltas (if any) live in vendor_modules/<name>/ with ledger entry (§20).
+ */
+/ {
+	fragment@0 {
+		target = <&camss>;
+		__overlay__ {
+			status = "okay"; /* SRC: stock-dump */
+			cam_sensor0: sensor@10 {
+				compatible = "sony,imx519"; /* SRC: stock-dump */
+				reg = <0x10>;
+				clocks = <&camcc 0>; /* SRC: datasheet-p4 — 24MHz mclk */
+			};
+		};
+	};
+};

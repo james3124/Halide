@@ -1,0 +1,18 @@
+# CRITICAL strings - zero untranslated in these flows is a release gate
+# (localization-workflow S6: lockscreen/calls/emergency/wipe + security prompts).
+# Format: <string-id> <flow>. Any miss blocks release. AVB/LUKS2/OTA security
+# prompts are critical in all locales.
+
+lockscreen-pin-prompt lockscreen
+lockscreen-emergency emergency
+calls-dial calls
+calls-hangup calls
+emergency-dialer emergency
+wipe-confirm wipe
+wipe-attestation wipe
+avb-corruption-explain security
+avb-rollback-explain security
+ota-reboot-prompt updates
+sim-pin-puk telephony
+permission-revoke-confirm permissions
+export-logs-consent privacy
